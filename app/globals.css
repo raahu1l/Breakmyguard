@@ -1,26 +1,49 @@
+/* Tailwind v4 recommended import */
 @import "tailwindcss";
 
+/* optional defaults */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0f172a;
+  --card: #0f0f11;
+  --muted: #888;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  min-height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Chat bubble fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.bubble-anim {
+  animation: fadeInUp 0.25s ease-out;
+}
+
+/* Button tap animation */
+.btn-tap {
+  transition: transform 0.08s ease;
+}
+.btn-tap:active {
+  transform: scale(0.92);
+}
+
+/* Timer pulse when low */
+@keyframes pulseRed {
+  0% { color: #ff6b6b; transform: scale(1); }
+  50% { color: #ff2e2e; transform: scale(1.15); }
+  100% { color: #ff6b6b; transform: scale(1); }
+}
+
+.timer-low {
+  animation: pulseRed 0.9s infinite;
 }
