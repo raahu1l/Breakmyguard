@@ -148,3 +148,8 @@ All rights are reserved by the author.
 ### ⭐ If you enjoy this project
 
 Give the repo a star and challenge your friends to break the guard.
+
+### 👤 Built by
+
+**Rahul Walawalkar**  
+An indie experiment in AI, games, and prompt engineering
