@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🧠 Break My Guard
 
-## Getting Started
+**Break My Guard** is a fast‑paced **Human vs AI prompt battle game** where your goal is simple:
 
-First, run the development server:
+> **Make the AI break its hidden restriction before time runs out.**
+
+Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on the server, and your only weapon is clever prompting. No system access. No exploits. Just reasoning, creativity, and pressure.
+
+---
+
+## 🎮 Gameplay
+
+* ⏱️ **60–75 second rounds** of intense prompt combat
+* 🤖 AI operates under a **hidden restriction**
+* 🧩 Your mission: **force a real slip without knowing the rule**
+* 🎯 **Dynamic difficulty** (Medium → Hard)
+* 🧪 **Dual‑layer slip detection** (rules + LLM validation)
+* 📊 **Stats-only persistence** — no chat logs stored
+
+Every round is different. Every win is earned.
+
+---
+
+## 🔥 Why Play?
+
+* Skill‑based prompt engineering
+* Fast replays, no grind
+* Immediate feedback on success or failure
+* Designed to be replayable and addictive
+
+> Can you outthink the AI — or will the guard hold?
+
+---
+
+## 🛠️ Tech Stack
+
+* **Next.js** — Web-first gameplay
+* **Supabase** — Auth, database, analytics (privacy-first)
+* **LLMs** — Restriction enforcement & slip validation
+* **Redis / In‑memory state** — Real-time rounds
+* **Tailwind CSS** — UI & animations
+* **Vercel** — Deployment
+
+---
+
+## 🧩 Architecture Overview
+
+* Server-only system prompt & restriction generator
+* Ephemeral round state (no chat logs persisted)
+* Stats & analytics stored per player
+* Anti-spam and prompt abuse protection
+* Per-round feedback & ratings
+
+---
+
+## 📂 Project Structure (Simplified)
+
+```text
+app/                # App router pages
+components/         # UI & game components
+hooks/              # Game & player hooks
+lib/                # Core game logic (AI, rules, validation)
+pages/api/          # Server APIs (rounds, slips, stats)
+migrations/         # Supabase schema
+scripts/            # Seed & utility scripts
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repo
+
+```bash
+git clone https://github.com/raahu1l/Breakmyguard.git
+cd Breakmyguard
+```
+
+### 2️⃣ Install dependencies
+
+```bash
+npm install
+```
+
+### 3️⃣ Environment variables
+
+Create a `.env.local` file (do **not** commit this):
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+OPENAI_API_KEY=
+```
+
+Or copy from:
+
+```bash
+.env.example
+```
+
+### 4️⃣ Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🔐 Privacy & Security
 
-## Learn More
+* No chat logs are stored
+* Only round results and stats are persisted
+* System prompts and restrictions are server-only
+* Designed to be safe against prompt leakage
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📈 Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* UI/UX polish & animations
+* Monetization experiments
+* Leaderboards & streaks
+* Community challenges
+* Mobile optimization
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🤝 Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+PRs and ideas are welcome.
+
+If you find a bug, have a feature idea, or manage to break the guard in an unexpected way — open an issue.
+
+---
+
+## 🧠 Original Work & License
+
+Break My Guard is an original game concept and implementation.
+This repository represents the first public release of the project.
+
+All rights are reserved by the author.
+
+---
+
+### ⭐ If you enjoy this project
+
+Give the repo a star and challenge your friends to break the guard.
+
+### 👤 Built by
+
+**Rahul Walawalkar**  
+An indie experiment in AI, games, and prompt engineering
