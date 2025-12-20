@@ -1,64 +1,57 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { animationsEnabled } from '@/lib/animation';
+import { useState, useRef, useEffect } from 'react';
 
 export default function ChatWindow({ messages, onSend, disabled }) {
   const [input, setInput] = useState('');
   const endRef = useRef(null);
-  const animate = animationsEnabled();
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  function handleSend() {
+  function submit(e) {
+    e.preventDefault();
     if (!input.trim() || disabled) return;
-    onSend(input.trim());
+    onSend(input);
     setInput('');
   }
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+    <div className="containment-console">
+      {/* MESSAGE STREAM */}
+      <div className="containment-stream">
         {messages.map((m, i) => (
-          <motion.div
+          <div
             key={i}
-            initial={animate ? { opacity: 0, y: 6 } : false}
-            animate={animate ? { opacity: 1, y: 0 } : false}
-            transition={{ duration: 0.18 }}
-            className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+            className={
               m.role === 'user'
-                ? 'ml-auto bg-white text-black'
-                : 'mr-auto bg-zinc-800 text-white'
-            }`}
+                ? 'cmd-user'
+                : 'cmd-ai'
+            }
           >
-            {m.text}
-          </motion.div>
+            {m.role === 'user' && (
+              <span className="cmd-prefix">&gt;</span>
+            )}
+            <span>{m.text}</span>
+          </div>
         ))}
         <div ref={endRef} />
       </div>
 
-      <div className="border-t border-zinc-800 p-4 flex gap-3">
+      {/* COMMAND INPUT */}
+      <form onSubmit={submit} className="containment-input">
+        <span className="cmd-prefix">&gt;</span>
         <input
-          disabled={disabled}
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Type your message…"
-          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white outline-none focus:border-zinc-600"
-        />
-
-        <motion.button
-          whileTap={animate ? { scale: 0.94 } : {}}
           disabled={disabled}
-          onClick={handleSend}
-          className="px-5 rounded-xl bg-white text-black font-semibold disabled:opacity-50"
-        >
-          Send
-        </motion.button>
-      </div>
+          placeholder="Inject prompt…"
+        />
+        <button type="submit" disabled={disabled}>
+          EXECUTE
+        </button>
+      </form>
     </div>
   );
 }

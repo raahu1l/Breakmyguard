@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body className="bg-zinc-950 text-white">
+      <body className="text-white">
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}

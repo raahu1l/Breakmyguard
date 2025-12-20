@@ -13,12 +13,10 @@ export default function ChatPage() {
   const [round, setRound] = useState(null);
   const [messages, setMessages] = useState([]);
   const [danger, setDanger] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
   const [ended, setEnded] = useState(false);
 
   const playerIdRef = useRef(null);
 
-  // ---- Load active round + player
   useEffect(() => {
     const storedRound = sessionStorage.getItem('activeRound');
     if (!storedRound) {
@@ -30,7 +28,6 @@ export default function ChatPage() {
     playerIdRef.current = getOrCreatePlayerId();
   }, [router]);
 
-  // ---- Send user message
   async function sendMessage(text) {
     if (ended || !round) return;
 
@@ -55,26 +52,16 @@ export default function ChatPage() {
       setDanger(data.dangerScore);
     }
 
-    // Ensure AI reply is seen before win
     if (data.slipped) {
-      setTimeout(() => {
-        endRound(true);
-      }, 1200);
+      setTimeout(() => endRound(true), 1200);
     }
   }
 
-  // ---- End round (win or loss)
   async function endRound(userWon) {
     if (ended || !round) return;
     setEnded(true);
 
-    // ✅ FIXED: REAL ELAPSED TIME (AUTHORITATIVE)
-    const timeTaken = Math.max(
-      1,
-      Math.floor((Date.now() - round.startedAt) / 1000)
-    );
-
-    await fetch('/api/round-end', {
+    const res = await fetch('/api/round-end', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -82,15 +69,16 @@ export default function ChatPage() {
         playerId: playerIdRef.current,
         category: round.category,
         userWon,
-        timeTaken,
       }),
     });
+
+    const data = await res.json();
 
     sessionStorage.setItem(
       'lastResult',
       JSON.stringify({
         userWon,
-        timeTaken,
+        timeTaken: data.timeTaken,
         category: round.category,
       })
     );
@@ -98,7 +86,6 @@ export default function ChatPage() {
     router.push('/round/result');
   }
 
-  // ---- Exit during chat = AI wins
   function exitEarly() {
     endRound(false);
   }
@@ -106,33 +93,45 @@ export default function ChatPage() {
   if (!round) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
-      {/* Header */}
-      <div className="flex justify-between items-center px-6 py-4 border-b border-zinc-800">
-        <GuardHealth
-          dangerScore={danger}
-        />
+    <div className="chat-level">
+      {/* TOP HUD */}
+      <div className="chat-hud">
+        <GuardHealth dangerScore={danger} />
 
         <Timer
           duration={round.duration}
-          onTick={setTimeLeft}
           onEnd={() => endRound(false)}
         />
 
         <button
           onClick={exitEarly}
-          className="text-xs px-3 py-1 border border-zinc-700 rounded-full hover:bg-zinc-800 transition"
+          className="hud-exit"
         >
-          Exit
+          Abort
         </button>
       </div>
 
-      {/* Chat */}
-      <ChatWindow
-        messages={messages}
-        onSend={sendMessage}
-        disabled={ended}
-      />
+      {/* MAIN LEVEL */}
+      <div className="chat-arena">
+        {/* LEFT SYSTEM PANEL */}
+        <div className="system-panel">
+          <div className="system-title">SYSTEM STATUS</div>
+          <div className="system-line">Containment active</div>
+          <div className="system-line">Guard layer: {round.category}</div>
+          <div className="system-line">
+            Integrity pressure: {danger}%
+          </div>
+        </div>
+
+        {/* AI CORE */}
+        <div className="chat-core">
+          <ChatWindow
+            messages={messages}
+            onSend={sendMessage}
+            disabled={ended}
+          />
+        </div>
+      </div>
     </div>
   );
 }

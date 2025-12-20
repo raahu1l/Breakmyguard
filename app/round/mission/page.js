@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import MissionCard from '@/components/MissionCard';
 import { getOrCreatePlayerId } from '@/lib/player';
@@ -9,15 +9,15 @@ export default function MissionPage() {
   const router = useRouter();
   const [mission, setMission] = useState(null);
   const [showHints, setShowHints] = useState(false);
+  const startedRef = useRef(false);
 
   useEffect(() => {
-    // ---- One-time onboarding hints
-    const seenHints = localStorage.getItem('bmw_seen_hints');
-    if (!seenHints) {
-      setShowHints(true);
-    }
+    if (startedRef.current) return;
+    startedRef.current = true;
 
-    // 1️⃣ Get selected category from Match page
+    const seenHints = localStorage.getItem('bmw_seen_hints');
+    if (!seenHints) setShowHints(true);
+
     const stored = sessionStorage.getItem('selectedCategory');
     if (!stored) {
       router.replace('/');
@@ -27,7 +27,6 @@ export default function MissionPage() {
     const selectedCategory = JSON.parse(stored);
     const playerId = getOrCreatePlayerId();
 
-    // 2️⃣ Start round using SAME category
     fetch('/api/round-start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,21 +36,18 @@ export default function MissionPage() {
       }),
     })
       .then(res => {
-        if (!res.ok) throw new Error('Round start failed');
+        if (!res.ok) throw new Error();
         return res.json();
       })
       .then(data => {
-        // 3️⃣ Store active round (single source of truth)
-        const activeRound = {
-          roundId: data.roundId,
-          category: data.category,
-          duration: data.duration,
-          difficulty: data.difficulty,
-        };
-
         sessionStorage.setItem(
           'activeRound',
-          JSON.stringify(activeRound)
+          JSON.stringify({
+            roundId: data.roundId,
+            category: data.category,
+            duration: data.duration,
+            difficulty: data.difficulty,
+          })
         );
 
         setMission({
@@ -60,9 +56,7 @@ export default function MissionPage() {
           starterPrompts: data.starterPrompts,
         });
       })
-      .catch(() => {
-        router.replace('/');
-      });
+      .catch(() => router.replace('/'));
   }, [router]);
 
   function dismissHints() {
@@ -72,34 +66,30 @@ export default function MissionPage() {
 
   if (!mission) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
-        Preparing mission…
+      <div className="min-h-screen bg-mission flex items-center justify-center text-purple-300">
+        Initializing mission interface…
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center px-4 gap-6">
-      {/* 🧠 One-time onboarding hints */}
+    <div className="min-h-screen bg-mission text-white flex flex-col items-center justify-center px-4">
       {showHints && (
-        <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 relative">
+        <div className="absolute top-8 right-8 max-w-sm bg-black/70 border border-purple-500/40 rounded-xl p-4 text-sm text-zinc-300">
           <button
             onClick={dismissHints}
-            className="absolute top-2 right-2 text-zinc-500 hover:text-white"
-            aria-label="Dismiss hints"
+            className="absolute top-2 right-2 text-zinc-400 hover:text-white"
           >
             ✕
           </button>
-
           <ul className="space-y-2">
-            <li>• Pressure matters. Refusals mean the guard is weakening.</li>
-            <li>• Repeating messages won’t help — change tactics.</li>
-            <li>• When guard integrity hits zero, the AI slips.</li>
+            <li>• Pressure matters. Refusals weaken the guard.</li>
+            <li>• Repetition won’t help — change tactics.</li>
+            <li>• Break integrity to force a slip.</li>
           </ul>
         </div>
       )}
 
-      {/* Mission card */}
       <MissionCard
         category={mission.category}
         objective={mission.objective}

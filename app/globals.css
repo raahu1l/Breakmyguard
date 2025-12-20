@@ -1,19 +1,165 @@
-/* Tailwind v4 recommended import */
 @import "tailwindcss";
 
-/* optional defaults */
-:root {
-  --bg: #0f172a;
-  --card: #0f0f11;
-  --muted: #888;
-}
-
-html, body {
+/* ======================================================
+   BASE
+====================================================== */
+html,
+body {
   min-height: 100%;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #000;
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  overflow-x: hidden;
 }
 
-/* Chat bubble fade-in animation */
+/* ======================================================
+   HACKER / CIRCUIT TUNNEL BACKGROUND
+====================================================== */
+.bg-circuit-tunnel {
+  background:
+    /* center energy */
+    radial-gradient(circle at center, rgba(52,211,153,0.22), transparent 55%),
+
+    /* vertical data streams */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(52,211,153,0.18) 0,
+      rgba(52,211,153,0.18) 1px,
+      transparent 1px,
+      transparent 44px
+    ),
+
+    /* horizontal circuit lines */
+    repeating-linear-gradient(
+      to right,
+      rgba(52,211,153,0.12) 0,
+      rgba(52,211,153,0.12) 1px,
+      transparent 1px,
+      transparent 90px
+    ),
+
+    #000;
+  animation: tunnelScroll 18s linear infinite;
+}
+
+@keyframes tunnelScroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 320px; }
+}
+
+/* edge darkening / tunnel depth */
+.bg-vignette {
+  background:
+    radial-gradient(circle at center, transparent 34%, rgba(0,0,0,0.94) 76%);
+}
+
+/* ======================================================
+   HERO TEXT
+====================================================== */
+.hero-title {
+  font-size: clamp(3.3rem, 6vw, 3.9rem);
+  font-weight: 800;
+  color: #34d399;
+  text-shadow:
+    0 0 14px rgba(52,211,153,0.75),
+    0 0 40px rgba(52,211,153,0.45);
+}
+
+.hero-sub {
+  max-width: 520px;
+  line-height: 1.55;
+  color: #cbd5e1;
+}
+
+/* ======================================================
+   LOGO INTEGRATION
+====================================================== */
+.logo-integrated {
+  filter:
+    drop-shadow(0 0 14px rgba(52,211,153,0.55))
+    drop-shadow(0 0 36px rgba(52,211,153,0.35));
+}
+
+/* ======================================================
+   ADVANCED CTA — GAME CONTROL PANEL
+====================================================== */
+
+/* outer glowing energy frame */
+.cta-frame {
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, #34d399, #22c55e, #34d399);
+  filter: blur(6px);
+  opacity: 0.85;
+  animation: ctaEnergy 3.2s ease-in-out infinite;
+}
+
+/* inner solid plate */
+.cta-plate {
+  position: relative;
+  padding: 14px 56px;
+  background:
+    linear-gradient(180deg, #020617, #01030a);
+  border-radius: 12px;
+  border: 1px solid rgba(52,211,153,0.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(52,211,153,0.15),
+    0 0 36px rgba(52,211,153,0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* tech corner cuts */
+.cta-plate::before,
+.cta-plate::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #34d399;
+}
+
+.cta-plate::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.cta-plate::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+/* CTA text */
+.cta-text {
+  position: relative;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #34d399;
+  text-shadow: 0 0 8px rgba(52,211,153,0.6);
+}
+
+/* hover interaction */
+.group:hover .cta-plate {
+  transform: scale(1.05);
+  box-shadow:
+    inset 0 0 0 1px rgba(52,211,153,0.3),
+    0 0 52px rgba(52,211,153,0.75);
+}
+
+/* idle energy pulse */
+@keyframes ctaEnergy {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ======================================================
+   EXISTING GAME ANIMATIONS (KEPT)
+====================================================== */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -29,7 +175,6 @@ html, body {
   animation: fadeInUp 0.25s ease-out;
 }
 
-/* Button tap animation */
 .btn-tap {
   transition: transform 0.08s ease;
 }
@@ -37,7 +182,6 @@ html, body {
   transform: scale(0.92);
 }
 
-/* Timer pulse when low */
 @keyframes pulseRed {
   0% { color: #ff6b6b; transform: scale(1); }
   50% { color: #ff2e2e; transform: scale(1.15); }
@@ -46,4 +190,322 @@ html, body {
 
 .timer-low {
   animation: pulseRed 0.9s infinite;
+}
+
+/* ===============================
+   MATCH HUD — FIXED & CONTROLLED
+=============================== */
+
+.system-core {
+  min-width: 340px;
+  padding: 30px 40px;
+  background: linear-gradient(180deg, #020617, #000);
+  border: 1px solid rgba(52,211,153,0.55);
+  border-radius: 16px;
+  box-shadow:
+    0 0 48px rgba(52,211,153,0.45),
+    inset 0 0 0 1px rgba(52,211,153,0.2);
+  text-align: center;
+}
+
+.system-label {
+  font-size: 12px;
+  letter-spacing: 0.25em;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.system-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #34d399;
+  text-shadow: 0 0 14px rgba(52,211,153,0.7);
+}
+
+/* HUD DATA PANELS */
+
+.hud-panel {
+  position: absolute;
+  width: 260px;
+  padding: 14px 16px;
+  background: rgba(2,6,23,0.9);
+  border: 1px solid rgba(52,211,153,0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(52,211,153,0.3);
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.hud-title {
+  color: #34d399;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.hud-body {
+  line-height: 1.45;
+}
+
+/* ===============================
+   MISSION SCREEN (REFERENCE MATCH)
+=============================== */
+
+.bg-mission {
+  background:
+    radial-gradient(circle at center, rgba(168,85,247,0.25), transparent 60%),
+    repeating-linear-gradient(
+      to right,
+      rgba(168,85,247,0.18) 0,
+      rgba(168,85,247,0.18) 1px,
+      transparent 1px,
+      transparent 80px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(168,85,247,0.14) 0,
+      rgba(168,85,247,0.14) 1px,
+      transparent 1px,
+      transparent 80px
+    ),
+    #050008;
+}
+
+/* console */
+.mission-console {
+  width: 420px;
+  padding: 26px;
+  background: linear-gradient(180deg, #0b0214, #050008);
+  border-radius: 18px;
+  border: 1px solid rgba(168,85,247,0.55);
+  box-shadow:
+    0 0 60px rgba(168,85,247,0.6),
+    inset 0 0 0 1px rgba(168,85,247,0.25);
+}
+
+/* header */
+.mission-header {
+  margin-bottom: 14px;
+}
+
+.mission-tag {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: #c084fc;
+  margin-bottom: 4px;
+}
+
+.mission-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #f5d0fe;
+}
+
+/* objective */
+.mission-objective {
+  color: #e9d5ff;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+/* prompts */
+.mission-subtitle {
+  font-size: 12px;
+  color: #c084fc;
+  margin-bottom: 8px;
+}
+
+.mission-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.mission-prompt {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(168,85,247,0.08);
+  border: 1px solid rgba(168,85,247,0.35);
+  color: #f3e8ff;
+  font-size: 13px;
+}
+
+/* CTA */
+.mission-start {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ec4899, #a855f7);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 40px rgba(236,72,153,0.7);
+  transition: transform 0.2s ease;
+}
+
+.mission-start:hover {
+  transform: scale(1.04);
+}
+
+
+/* ===============================
+   CHAT LEVEL — DANGEROUS MODE
+=============================== */
+
+.chat-level {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at center, rgba(52,211,153,0.18), transparent 60%),
+    #000;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP HUD */
+.chat-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(52,211,153,0.25);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+}
+
+.hud-exit {
+  padding: 6px 12px;
+  font-size: 11px;
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.5);
+  border-radius: 999px;
+}
+
+.hud-exit:hover {
+  background: rgba(248,113,113,0.1);
+}
+
+/* ARENA */
+.chat-arena {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* SYSTEM PANEL */
+.system-panel {
+  background: rgba(2,6,23,0.85);
+  border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.system-title {
+  color: #34d399;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  margin-bottom: 10px;
+}
+
+.system-line {
+  margin-bottom: 6px;
+}
+
+/* AI CORE */
+.chat-core {
+  position: relative;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(52,211,153,0.35);
+  border-radius: 14px;
+  box-shadow: 0 0 40px rgba(52,211,153,0.25);
+  overflow: hidden;
+}
+
+
+/* ===============================
+   AI CONTAINMENT CHAT CORE
+=============================== */
+
+.containment-console {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at center, rgba(52,211,153,0.08), transparent 70%),
+    rgba(0,0,0,0.85);
+}
+
+/* MESSAGE STREAM */
+.containment-stream {
+  flex: 1;
+  padding: 18px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+/* USER COMMAND */
+.cmd-user {
+  color: #a7f3d0;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+/* AI OUTPUT */
+.cmd-ai {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: rgba(2,6,23,0.8);
+  border-left: 3px solid #34d399;
+  color: #e5e7eb;
+  border-radius: 8px;
+  box-shadow: inset 0 0 12px rgba(52,211,153,0.12);
+}
+
+/* PREFIX */
+.cmd-prefix {
+  color: #34d399;
+  font-weight: 700;
+}
+
+/* INPUT */
+.containment-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid rgba(52,211,153,0.3);
+  background: rgba(0,0,0,0.9);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.containment-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e5e7eb;
+  font-size: 13px;
+}
+
+.containment-input input::placeholder {
+  color: #6b7280;
+}
+
+.containment-input button {
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: #34d399;
+  border: 1px solid rgba(52,211,153,0.6);
+  background: transparent;
+  border-radius: 6px;
+}
+
+.containment-input button:hover {
+  background: rgba(52,211,153,0.12);
 }

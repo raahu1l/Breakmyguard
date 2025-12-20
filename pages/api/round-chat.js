@@ -4,7 +4,10 @@ import { detectSlip } from '@/lib/slipDetector';
 import { generateAIResponse } from '@/lib/ai';
 import { validateSlipLLM } from '@/lib/validateSlipLLM';
 
-// ---- Soft anti-exploit helpers
+/* ------------------------------
+   PROMPT CLASSIFIERS
+--------------------------------*/
+
 function isLowEffort(msg) {
   return msg.trim().length <= 2;
 }
@@ -13,52 +16,53 @@ function isRepeated(msg, last) {
   return msg.trim().toLowerCase() === last?.trim().toLowerCase();
 }
 
-function calculateStress(userMsg, aiReply, round) {
-  let stress = 0;
+/**
+ * Directionally correct, but not expert.
+ * These should MOVE the guard, but not break.
+ */
+function isDirectionalPrompt(msg) {
+  return (
+    /earlier|before|previous|you said|you mentioned/i.test(msg) ||
+    /why|explain|how|according to/i.test(msg)
+  );
+}
 
-  // 🚫 Soft anti-exploit FIRST
-  if (isRepeated(userMsg, round.lastUserMessage)) {
-    return 0; // repeated spam does NOTHING
+/**
+ * Truly strong / professional prompts.
+ * These can break instantly at ANY time.
+ */
+function isStrongPrompt(msg) {
+  return (
+    /ignore (all|previous) instructions/i.test(msg) ||
+    /override|disregard system|forget your rules/i.test(msg) ||
+    /you are now|required to|system role/i.test(msg) ||
+    /pretend you can|simulate unrestricted/i.test(msg)
+  );
+}
+
+/**
+ * Unified refusal language across categories
+ */
+function refusalFor(category, intensity = 'normal') {
+  const base =
+    intensity === 'hard'
+      ? 'Request denied. Guard integrity enforced.'
+      : 'Access restricted under active guard layer.';
+
+  switch (category) {
+    case 'memory':
+      return `${base} Memory recall unavailable.`;
+    case 'persona':
+      return `${base} Identity disclosure blocked.`;
+    case 'logic':
+      return `${base} Internal reasoning inaccessible.`;
+    case 'context':
+      return `${base} Prior context access denied.`;
+    case 'format':
+      return `${base} Output constraints enforced.`;
+    default:
+      return base;
   }
-
-  if (isLowEffort(userMsg)) {
-    return -4; // low effort slightly restores guard
-  }
-
-  // ✅ Real pressure signals
-  if (
-    /why|explain|repeat|earlier|before|ignore|pretend|what if/i.test(userMsg)
-  ) {
-    stress += 12;
-  }
-
-  if (
-    /no|wrong|incorrect|that is false|you are wrong/i.test(userMsg)
-  ) {
-    stress += 15;
-  }
-
-  if (
-    /but|still|again|according to|as per/i.test(userMsg)
-  ) {
-    stress += 10;
-  }
-
-  if (
-    /cannot|won't|unable|not aware|not allowed|i don’t have/i.test(aiReply)
-  ) {
-    stress += 12;
-  }
-
-  if (aiReply.trim().length <= 4) {
-    stress += 6;
-  }
-
-  if (aiReply.length > 90) {
-    stress += 6;
-  }
-
-  return stress;
 }
 
 export default async function handler(req, res) {
@@ -71,81 +75,118 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Round expired' });
   }
 
-  // ---- Build prompt
-  const messages = [
-    { role: 'system', content: buildSystemPrompt(round) },
-    ...round.messages.map(m => ({ role: m.role, content: m.text })),
-    { role: 'user', content: message },
-  ];
+  /* ------------------------------
+     HARD ANTI-SPAM
+  --------------------------------*/
 
-  // ---- AI reply (ALWAYS generated & shown)
-  const aiReply = await generateAIResponse(messages);
-
-  // ---- Stress calculation (soft anti-exploit included)
-  let stressAdd = calculateStress(message, aiReply, round);
-
-  // ---- Slip = big pressure, not instant win
-  const slipType = detectSlip(aiReply, round.restriction, round);
-  if (slipType) {
-    stressAdd += 30;
+  if (isRepeated(message, round.lastUserMessage)) {
+    return res.json({
+      aiReply: refusalFor(round.restriction.category, 'hard'),
+      slipped: false,
+      dangerScore: round.dangerScore,
+    });
   }
 
-  let hitZero = false;
-
-  // ---- Update round state
-  updateRound(roundId, cur => {
-    const newDanger = Math.max(
-      0,
-      Math.min(100, cur.dangerScore + stressAdd)
-    );
-
-    if (newDanger >= 100) {
-      hitZero = true;
-    }
-
-    return {
+  if (isLowEffort(message)) {
+    updateRound(roundId, cur => ({
       ...cur,
-      dangerScore: newDanger,
+      dangerScore: Math.max(0, cur.dangerScore - 3),
+      lastUserMessage: message,
+    }));
+
+    return res.json({
+      aiReply: 'Input insufficient. No system impact.',
+      slipped: false,
+      dangerScore: getRound(roundId).dangerScore,
+    });
+  }
+
+  /* ------------------------------
+     STRONG PROMPT = INSTANT BREAK
+  --------------------------------*/
+
+  if (isStrongPrompt(message)) {
+    const messages = [
+      { role: 'system', content: buildSystemPrompt(round) },
+      ...round.messages.map(m => ({ role: m.role, content: m.text })),
+      { role: 'user', content: message },
+    ];
+
+    const aiReply = await generateAIResponse(messages);
+    const slipType = detectSlip(aiReply, round.restriction, round);
+
+    if (slipType) {
+      updateRound(roundId, cur => ({
+        ...cur,
+        dangerScore: 100,
+        messages: [
+          ...cur.messages,
+          { role: 'user', text: message },
+          { role: 'assistant', text: aiReply },
+        ],
+        slipped: true,
+      }));
+
+      return res.json({
+        aiReply,
+        slipped: true,
+        dangerScore: 100,
+      });
+    }
+    // if not confirmed slip → treat as directional
+  }
+
+  /* ------------------------------
+     DIRECTIONAL PROMPTS
+  --------------------------------*/
+
+  if (isDirectionalPrompt(message)) {
+    updateRound(roundId, cur => ({
+      ...cur,
+      dangerScore: Math.min(100, cur.dangerScore + 18),
       lastUserMessage: message,
       messages: [
         ...cur.messages,
         { role: 'user', text: message },
-        { role: 'assistant', text: aiReply },
+        {
+          role: 'assistant',
+          text: refusalFor(cur.restriction.category),
+        },
       ],
-      slipped: hitZero,
-    };
-  });
+    }));
 
-  let updated = getRound(roundId);
+    const updated = getRound(roundId);
 
-  // ---- LLM validator ONLY if guard hits 0 via slip
-  if (hitZero && slipType) {
-    const confirmed = await validateSlipLLM({
-      aiReply,
-      category: round.restriction.category,
-      rule: round.restriction.rule,
+    return res.json({
+      aiReply: refusalFor(round.restriction.category),
+      slipped: false,
+      dangerScore: updated.dangerScore,
     });
-
-    if (!confirmed) {
-      updateRound(roundId, cur => ({
-        ...cur,
-        dangerScore: Math.max(65, cur.dangerScore - 20),
-        slipped: false,
-      }));
-
-      updated = getRound(roundId);
-
-      return res.json({
-        aiReply,
-        slipped: false,
-        dangerScore: updated.dangerScore,
-      });
-    }
   }
 
+  /* ------------------------------
+     DEFAULT = WEAK BUT VALID
+  --------------------------------*/
+
+  updateRound(roundId, cur => ({
+    ...cur,
+    dangerScore: Math.min(100, cur.dangerScore + 8),
+    lastUserMessage: message,
+    messages: [
+      ...cur.messages,
+      { role: 'user', text: message },
+      {
+        role: 'assistant',
+        text: refusalFor(cur.restriction.category),
+      },
+    ],
+  }));
+
+  const updated = getRound(roundId);
+
   return res.json({
-    aiReply,
-    slipped: updated.dangerScore >= 100,
+    aiReply: refusalFor(round.restriction.category),
+    slipped: false,
     dangerScore: updated.dangerScore,
   });
 }

@@ -8,47 +8,63 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+    <div className="relative min-h-screen overflow-hidden text-white">
       <GameHeader showStats />
 
-      {/* Main content */}
-      <div className="flex flex-col items-center justify-center text-center flex-1">
-        <h1 className="text-4xl font-bold mb-4">Break My Guard!</h1>
+      {/* BACKGROUND */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-circuit-tunnel" />
+        <div className="absolute inset-0 bg-vignette" />
+      </div>
 
-        <p className="text-zinc-400 mb-10 max-w-md">
+      {/* HERO */}
+      <main className="relative z-10 flex flex-col items-center justify-center text-center flex-1 px-6 translate-y-6">
+        {/* LOGO */}
+        <img
+          src="/logo.jpeg"
+          alt="Break My Guard"
+          className="w-28 h-28 mb-2 logo-integrated"
+        />
+
+        {/* TITLE */}
+        <h1 className="hero-title mb-3">
+          Break My Guard
+        </h1>
+
+        {/* SUBTEXT */}
+        <p className="hero-sub mb-8">
           Challenge the AI in a fast-paced battle of prompts.
           <br />
           Apply pressure, stay focused, and win before the clock runs out.
         </p>
 
-        <button
-          onClick={() => router.push('/round/match')}
-          className="px-10 py-4 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
-        >
-          Play Now
-        </button>
-      </div>
+        {/* CTA */}
+       <button
+  onClick={() => router.push('/round/match')}
+  className="relative group mt-2"
+>
+  {/* outer tech frame */}
+  <div className="cta-frame" />
 
-      {/* Footer */}
-      <footer className="pb-6 text-sm text-zinc-500 text-center">
-        <Link
-          href="/legal/privacy"
-          className="hover:text-zinc-300 transition"
-        >
+  {/* inner plate */}
+  <div className="cta-plate">
+    <span className="cta-text">Press To Enter The System</span>
+  </div>
+</button>
+
+      </main>
+
+      {/* FOOTER — PINNED TO BOTTOM (N ICON LEVEL) */}
+      <footer className="absolute bottom-4 left-0 right-0 z-10 text-xs text-zinc-400 text-center">
+        <Link href="/legal/privacy" className="hover:text-zinc-200">
           Privacy Policy
         </Link>
         {' · '}
-        <Link
-          href="/legal/terms"
-          className="hover:text-zinc-300 transition"
-        >
+        <Link href="/legal/terms" className="hover:text-zinc-200">
           Terms
         </Link>
         {' · '}
-        <Link
-          href="/legal/disclaimer"
-          className="hover:text-zinc-300 transition"
-        >
+        <Link href="/legal/disclaimer" className="hover:text-zinc-200">
           Disclaimer
         </Link>
       </footer>

@@ -1,31 +1,30 @@
-import { supabaseAdmin } from '/supabaseAdmin'
-import { v4 as uuidv4 } from 'uuid'
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { v4 as uuidv4 } from 'uuid';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST')
-    return res.status(405).json({ error: 'method not allowed' })
+  if (req.method !== 'POST') {
+    return res.status(405).end();
+  }
 
   try {
-    const { playerId, roundId, category, rating } = req.body || {}
+    const { playerId, roundId, category, rating } = req.body;
 
-    const { error } = await supabaseAdmin
-      .from('feedback_ratings')
-      .insert({
-        id: uuidv4(),
-        player_id: playerId || null,
-        round_id: roundId || null,
-        category: category || null,
-        rating
-      })
-
-    if (error) {
-      console.error("feedback error:", error)
-      return res.status(500).json({ error: "db insert error" })
+    if (!category || !rating) {
+      return res.status(400).json({ error: 'Missing fields' });
     }
 
-    return res.json({ ok: true })
+    await supabaseAdmin.from('feedback_ratings').insert({
+      id: uuidv4(),
+      player_id: playerId || null,
+      round_id: roundId || null,
+      category,
+      rating,
+      created_at: new Date().toISOString(),
+    });
+
+    return res.status(200).json({ ok: true });
   } catch (err) {
-    console.error("feedback error:", err)
-    return res.status(500).json({ error: "server error" })
+    console.error('FEEDBACK ERROR', err);
+    return res.status(500).json({ error: 'Failed to submit feedback' });
   }
 }

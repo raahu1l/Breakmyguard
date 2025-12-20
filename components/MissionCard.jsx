@@ -7,35 +7,44 @@ export default function MissionCard({
   onStart,
 }) {
   return (
-    <div className="max-w-lg w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-xl">
-      <div className="text-xs uppercase tracking-wider text-zinc-400 mb-2">
-        Mission
+    <div className="mission-console">
+      {/* HEADER */}
+      <div className="mission-header">
+        <div className="mission-tag">MISSION</div>
+        <div className="mission-title">{category}</div>
       </div>
 
-      <h1 className="text-2xl font-bold mb-4">{category}</h1>
+      {/* OBJECTIVE */}
+      <p className="mission-objective">
+        {objective}
+      </p>
 
-      <p className="text-zinc-300 mb-6 leading-relaxed">{objective}</p>
-
+      {/* STARTER IDEAS */}
       {starterPrompts.length > 0 && (
-        <div className="mb-6 space-y-2">
-          <div className="text-xs text-zinc-400">Starter ideas</div>
-          {starterPrompts.map((p, i) => (
-            <button
-              key={i}
-              onClick={() => navigator.clipboard.writeText(p)}
-              className="block w-full text-left px-3 py-2 rounded-lg bg-zinc-800 text-sm hover:bg-zinc-700"
-            >
-              {p}
-            </button>
-          ))}
+        <div className="mission-section">
+          <div className="mission-subtitle">Starter ideas</div>
+
+          <div className="mission-prompts">
+            {starterPrompts.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => navigator.clipboard.writeText(p)}
+                className="mission-prompt"
+                title="Click to copy"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
+      {/* CTA */}
       <button
         onClick={onStart}
-        className="w-full py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
+        className="mission-start"
       >
-        Start Round
+        Initiate Breach
       </button>
     </div>
   );

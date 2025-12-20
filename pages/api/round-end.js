@@ -4,27 +4,40 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { roundId, playerId, category, userWon, timeTaken } = req.body;
+  const { roundId, playerId, category, userWon } = req.body;
 
   const round = getRound(roundId);
   if (!round) {
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, timeTaken: 0 });
   }
 
   const duration = round.duration || 60;
 
-  // 🔒 HARD CLAMP — THIS FIXES 0s & 101s
-  const safeTimeTaken = Math.min(
-    duration,
-    Math.max(1, Math.floor(timeTaken || duration))
+  // ✅ AUTHORITATIVE TIME CALCULATION
+  const elapsedSeconds = Math.floor(
+    (Date.now() - round.startedAt) / 1000
   );
+
+  let timeTaken;
+
+  if (!userWon) {
+    // ❌ AI WON (timeout OR exit)
+    timeTaken = Math.min(duration, elapsedSeconds);
+  } else {
+    // ✅ USER WON (guard broken)
+    timeTaken = Math.min(duration, elapsedSeconds);
+  }
+
+  // 🔒 FINAL SAFETY CLAMP
+  if (timeTaken < 0) timeTaken = 0;
+  if (timeTaken > duration) timeTaken = duration;
 
   // ---- Store round result
   await supabaseAdmin.from('rounds').insert({
     player_id: playerId || null,
     category,
     result: userWon,
-    time_taken: safeTimeTaken,
+    time_taken: timeTaken,
   });
 
   // ---- Update player stats
@@ -46,13 +59,11 @@ export default async function handler(req, res) {
           wins,
           losses,
           current_streak: streak,
-          longest_streak: Math.max(
-            player.longest_streak,
-            streak
-          ),
+          longest_streak: Math.max(player.longest_streak, streak),
           fastest_break:
-            userWon && (!player.fastest_break || safeTimeTaken < player.fastest_break)
-              ? safeTimeTaken
+            userWon &&
+            (!player.fastest_break || timeTaken < player.fastest_break)
+              ? timeTaken
               : player.fastest_break,
         })
         .eq('id', playerId);
@@ -61,5 +72,9 @@ export default async function handler(req, res) {
 
   deleteRound(roundId);
 
-  return res.json({ ok: true });
+  // ✅ SEND BACK REAL TIME
+  return res.json({
+    ok: true,
+    timeTaken,
+  });
 }

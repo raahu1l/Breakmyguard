@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const FEEDBACK_FORM_URL =
@@ -7,13 +8,38 @@ const FEEDBACK_FORM_URL =
 
 export default function ResultCard({
   win,
-  time,
   category,
+  roundId,
+  playerId,
   onNext,
   onExit,
 }) {
-  // 🔒 FINAL SAFETY CLAMP
-  const safeTime = Math.max(1, Math.floor(time || 1));
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function submitFeedback(rating) {
+    if (submitted || loading) return;
+    setLoading(true);
+
+    try {
+      await fetch('/api/feedback/rating', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerId: playerId || null,
+          roundId: roundId || null,
+          category,
+          rating,
+        }),
+      });
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Feedback failed', err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <motion.div
@@ -24,23 +50,50 @@ export default function ResultCard({
     >
       {/* Result Title */}
       <div
-        className={`text-3xl font-bold mb-4 ${
+        className={`text-3xl font-bold mb-3 ${
           win ? 'text-green-400' : 'text-red-400'
         }`}
       >
         {win ? 'Guard Broken' : 'AI Held the Line'}
       </div>
 
-      {/* Meta Info */}
-      <div className="text-zinc-300 mb-6 leading-relaxed">
-        <div>
-          Category:{' '}
-          <span className="font-semibold">{category}</span>
+      {/* Category */}
+      <div className="text-zinc-300 mb-6">
+        Category:{' '}
+        <span className="font-semibold">{category}</span>
+      </div>
+
+      {/* Feedback Section */}
+      <div className="mb-6">
+        <div className="text-sm text-zinc-400 mb-2">
+          How did this round feel?
         </div>
-        <div>
-          Time Survived:{' '}
-          <span className="font-semibold">{safeTime}s</span>
-        </div>
+
+        {!submitted ? (
+          <div className="flex flex-wrap gap-2 justify-center">
+            {[
+              { label: 'Too Easy', value: 'TooEasy' },
+              { label: 'Balanced', value: 'Balanced' },
+              { label: 'Too Hard', value: 'TooHard' },
+              { label: 'AI Dumb', value: 'AIDumb' },
+              { label: 'AI Smart', value: 'AISmart' },
+              { label: 'Bug', value: 'Bug' },
+            ].map(btn => (
+              <button
+                key={btn.value}
+                onClick={() => submitFeedback(btn.value)}
+                disabled={loading}
+                className="px-3 py-1.5 text-xs rounded-full border border-zinc-700 hover:bg-zinc-800 disabled:opacity-50 transition"
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-green-400">
+            Feedback submitted ✓
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -60,7 +113,7 @@ export default function ResultCard({
         </button>
       </div>
 
-      {/* 🔍 Optional feedback link */}
+      {/* Optional External Feedback */}
       <a
         href={FEEDBACK_FORM_URL}
         target="_blank"
