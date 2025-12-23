@@ -9,7 +9,7 @@ export default function MatchToMissionTransition() {
   useEffect(() => {
     const t = setTimeout(() => {
       router.replace('/round/mission');
-    }, 1400);
+    }, 1200);
 
     return () => clearTimeout(t);
   }, [router]);

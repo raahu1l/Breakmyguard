@@ -9,7 +9,7 @@ export default function ChatToResultTransition() {
   useEffect(() => {
     const t = setTimeout(() => {
       router.replace('/round/result');
-    }, 900);
+    }, 1300);
 
     return () => clearTimeout(t);
   }, [router]);

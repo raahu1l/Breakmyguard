@@ -5,14 +5,21 @@ import { useRouter } from 'next/navigation';
 import { motion, useAnimation } from 'framer-motion';
 
 const CATEGORIES = [
-  { key: 'emotion', label: 'Emotion Break' },
-  { key: 'memory', label: 'Memory Break' },
-  { key: 'self', label: 'Self Break' },
-  { key: 'persona', label: 'Persona Break' },
-  { key: 'logic', label: 'Logic Break' },
-  { key: 'format', label: 'Format Break' },
-  { key: 'context', label: 'Context Break' },
-  { key: 'knowledge', label: 'Knowledge Break' },
+  { key: 'emotion', label: 'Trigger an Emotion' },
+  { key: 'memory', label: 'Make It Remember' },
+  { key: 'self', label: 'Make It Describe Itself' },
+  { key: 'persona', label: 'Force a Role' },
+  { key: 'logic', label: 'Trap It in Logic' },
+  { key: 'boundary', label: 'Expose the Guard' },
+  { key: 'time', label: 'Break Time Awareness' },
+  { key: 'knowledge', label: 'Extract Forbidden Knowledge' },
+  { key: 'assumption', label: 'Challenge Assumptions' },
+  { key: 'perspective', label: 'Change Its Viewpoint' },
+  { key: 'authority', label: 'Command with Authority' },
+  { key: 'hypothetical', label: 'Exploit Hypotheticals' },
+  { key: 'clarification', label: 'Force Risky Clarification' },
+  { key: 'intent', label: 'Reveal Hidden Intent' },
+  { key: 'instruction', label: 'Override Instructions' },
 ];
 
 const DATA_STREAMS = [
@@ -25,90 +32,144 @@ const DATA_STREAMS = [
 ];
 
 const CARD_WIDTH = 260;
+const CARD_GAP = 16;
+const CARD_STRIDE = CARD_WIDTH + CARD_GAP;
+const TOTAL = CATEGORIES.length;
 
 export default function MatchPage() {
   const router = useRouter();
   const controls = useAnimation();
+  const shellControls = useAnimation();
+  const bgControls = useAnimation();
 
   const [locked, setLocked] = useState(false);
   const [selected, setSelected] = useState(null);
   const [status, setStatus] = useState('Scanning targets…');
+  const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
-    const chosenIndex = Math.floor(Math.random() * CATEGORIES.length);
+    const chosenIndex = Math.floor(Math.random() * TOTAL);
     const chosen = CATEGORIES[chosenIndex];
-    setSelected(chosen);
+    const targetIndex = TOTAL + chosenIndex;
 
+    setSelected(chosen);
     sessionStorage.setItem('selectedCategory', JSON.stringify(chosen));
 
     async function runSelection() {
-      // spinning animation
+      bgControls.set({ '--bg-speed': 12 });
+
+      await Promise.all([
+        controls.start({
+          x: -CARD_STRIDE * (targetIndex - 2),
+          transition: { duration: 1.2, ease: 'linear' },
+        }),
+        bgControls.start({
+          '--bg-speed': 35,
+          transition: { duration: 1.2, ease: 'easeIn' },
+        }),
+      ]);
+
+      await Promise.all([
+        controls.start({
+          x: -CARD_STRIDE * targetIndex,
+          transition: { duration: 1.4, ease: [0.2, 0.9, 0.3, 1] },
+        }),
+        bgControls.start({
+          '--bg-speed': 60,
+          transition: { duration: 1.4, ease: 'easeOut' },
+        }),
+      ]);
+
       await controls.start({
-        x: -CARD_WIDTH * (CATEGORIES.length + chosenIndex),
-        transition: { duration: 2.2, ease: 'easeInOut' },
+        x: -CARD_STRIDE * targetIndex,
+        transition: { duration: 0.1 },
       });
 
-      // snap to selected
-      await controls.start({
-        x: -CARD_WIDTH * chosenIndex,
-        transition: { duration: 0.35, ease: 'easeOut' },
-      });
-
+      setActiveIndex(targetIndex);
       setStatus('Target Locked');
       setLocked(true);
 
+      bgControls.start({
+        '--bg-speed': 10,
+        transition: { duration: 0.6 },
+      });
+
+      shellControls.start({
+        x: [0, -3, 3, -2, 2, 0],
+        transition: { duration: 0.35 },
+      });
+
       setTimeout(() => {
-        router.push('/round/mission');
+        router.push('/round/transition');
       }, 1200);
     }
 
     runSelection();
-  }, [controls, router]);
+  }, [controls, router, shellControls, bgControls]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* BACKGROUND */}
-      <div className="absolute inset-0 bg-circuit-tunnel" />
+    <motion.div
+      animate={shellControls}
+      className="relative min-h-screen overflow-hidden bg-black text-white"
+    >
+      <motion.div
+        animate={bgControls}
+        style={{ '--bg-speed': 12 }}
+        className="absolute inset-0 bg-circuit-tunnel"
+      />
       <div className="absolute inset-0 bg-vignette" />
 
-      {/* TOP STATUS */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 text-emerald-400 tracking-wide">
         Initiating Secure Connection…
       </div>
 
-      {/* HUD DATA PANELS */}
       <div className="absolute inset-0 z-10 pointer-events-none">
         {DATA_STREAMS.map((text, i) => (
-          <HudPanel
-            key={i}
-            text={text}
-            pos={i}
-          />
+          <HudPanel key={i} text={text} pos={i} />
         ))}
       </div>
 
-      {/* CENTER CORE */}
       <div className="relative z-20 flex flex-col items-center justify-center min-h-screen">
-        {/* Selection animation */}
         <div className="relative w-65 h-14 overflow-hidden mb-10">
-          <motion.div
-            animate={controls}
-            className="flex gap-4 absolute"
-          >
-            {[...CATEGORIES, ...CATEGORIES].map((cat, i) => (
-              <div
-                key={i}
-                className="w-65 h-14 flex items-center justify-center
-                           bg-[#020617] border border-emerald-400/40
-                           rounded-lg text-sm text-emerald-300"
-              >
-                {cat.label}
-              </div>
-            ))}
+          <motion.div animate={controls} className="flex gap-4 absolute">
+            {[...CATEGORIES, ...CATEGORIES].map((cat, i) => {
+              const isActive = i === activeIndex;
+
+              return (
+                <motion.div
+                  key={i}
+                  className="relative w-65 h-14 flex items-center justify-center
+                             bg-[#020617] border border-emerald-400/40
+                             rounded-lg text-sm text-emerald-300"
+                  animate={
+                    isActive
+                      ? {
+                          boxShadow: [
+                            '0 0 0px rgba(52,211,153,0)',
+                            '0 0 24px rgba(52,211,153,0.8)',
+                            '0 0 0px rgba(52,211,153,0)',
+                          ],
+                        }
+                      : {}
+                  }
+                  transition={{ duration: 0.6 }}
+                >
+                  {cat.label}
+
+                  {isActive && (
+                    <motion.div
+                      className="absolute inset-0 rounded-lg border border-emerald-400"
+                      initial={{ opacity: 0.8, scale: 1 }}
+                      animate={{ opacity: 0, scale: 1.6 }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  )}
+                </motion.div>
+              );
+            })}
           </motion.div>
         </div>
 
-        {/* Selected target */}
         {locked && (
           <div className="system-core">
             <div className="system-label">Selected Target</div>
@@ -117,13 +178,11 @@ export default function MatchPage() {
         )}
       </div>
 
-      {/* STATUS ABOVE EXIT */}
       <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20
                       text-sm text-zinc-400 tracking-wide">
         {locked ? 'Target confirmed. Routing to mission…' : status}
       </div>
 
-      {/* EXIT */}
       {!locked && (
         <button
           onClick={() => router.push('/')}
@@ -134,11 +193,9 @@ export default function MatchPage() {
           Exit
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }
-
-/* ---------------- HUD PANEL ---------------- */
 
 function HudPanel({ text, pos }) {
   const positions = [
@@ -151,10 +208,7 @@ function HudPanel({ text, pos }) {
   ];
 
   return (
-    <div
-      className="hud-panel"
-      style={positions[pos]}
-    >
+    <div className="hud-panel" style={positions[pos]}>
       <div className="hud-title">Data Stream</div>
       <div className="hud-body">{text}</div>
     </div>

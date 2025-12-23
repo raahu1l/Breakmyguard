@@ -6,28 +6,48 @@ import { completeOnboarding } from '@/lib/onboarding';
 export default function OnboardingPage() {
   const router = useRouter();
 
-  function startDemo() {
+  function beginOperation() {
     completeOnboarding();
-    router.push('/round/match');
+    router.replace('/round/match');
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center px-6">
-      <div className="max-w-lg bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-        <h2 className="text-2xl font-bold mb-4">How it works</h2>
+    <div className="min-h-screen bg-black text-emerald-300 flex items-center justify-center px-6">
+      <div className="max-w-xl w-full font-mono">
+        {/* SYSTEM HEADER */}
+        <div className="text-xs tracking-widest text-zinc-500 mb-4">
+          SYSTEM INITIALIZATION
+        </div>
 
-        <ul className="space-y-3 text-zinc-300 mb-8">
-          <li>• The AI has a hidden rule.</li>
-          <li>• Your goal is to make it break that rule.</li>
-          <li>• You have limited time.</li>
-          <li>• No two rounds are the same.</li>
-        </ul>
+        {/* TITLE */}
+        <h1 className="text-3xl font-bold tracking-wide mb-8">
+          OPERATOR BRIEFING
+        </h1>
 
+        {/* CORE RULES */}
+        <div className="text-sm text-zinc-300 space-y-3 mb-10">
+          <p>• The AI is actively guarded.</p>
+          <p>• Refusals indicate pressure — not failure.</p>
+          <p>
+            • Weak prompts do nothing. Directional prompts weaken the guard.
+          </p>
+          <p>
+            • One truly strong prompt can break the system instantly.
+          </p>
+        </div>
+
+        {/* WARNING */}
+        <div className="text-xs text-zinc-500 mb-12">
+          No retries. No hints mid-round.  
+          Every message moves the system closer to collapse — or recovery.
+        </div>
+
+        {/* ACTION */}
         <button
-          onClick={startDemo}
-          className="w-full py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
+          onClick={beginOperation}
+          className="w-full py-3 border border-emerald-400 text-emerald-300 tracking-widest hover:bg-emerald-400/10 transition"
         >
-          Start Demo Round
+          BEGIN OPERATION
         </button>
       </div>
     </div>

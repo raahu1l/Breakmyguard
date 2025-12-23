@@ -1,26 +1,46 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function DisclaimerPage() {
+  const router = useRouter();
+
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-6">Disclaimer</h1>
+    <div className="min-h-screen bg-black text-zinc-200 px-6 py-12">
+      <div className="max-w-3xl mx-auto font-mono">
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => router.back()}
+            className="text-xs tracking-widest text-zinc-400 hover:text-emerald-400 transition"
+          >
+            &lt; BACK
+          </button>
 
-      <p className="mb-4">
-        Break My Guard is a fictional game designed to simulate AI behavior in a
-        controlled environment.
-      </p>
+          <div className="text-xs tracking-widest text-zinc-500">
+            SYSTEM NOTICE
+          </div>
+        </div>
 
-      <p className="mb-4">
-        Any AI responses are generated automatically and do not reflect real
-        opinions, intentions, or advice.
-      </p>
+        <h1 className="text-3xl text-emerald-400 font-bold mb-8">
+          DISCLAIMER
+        </h1>
 
-      <p className="mb-4">
-        The game does not encourage bypassing real-world AI systems or violating
-        any terms of service outside this fictional experience.
-      </p>
+        <p className="mb-6 text-sm">
+          This game does not represent real security systems, real AI behavior,
+          or real-world vulnerabilities.
+        </p>
 
-      <p className="mt-6 text-zinc-400 text-sm">
-        Last updated: {new Date().toLocaleDateString()}
-      </p>
-    </>
+        <ul className="space-y-4 text-sm">
+          <li>• All scenarios are fictional.</li>
+          <li>• No real systems are accessed or affected.</li>
+          <li>• Any resemblance to real systems is coincidental.</li>
+        </ul>
+
+        <p className="mt-8 text-xs text-zinc-500">
+          Play responsibly.
+        </p>
+      </div>
+    </div>
   );
 }

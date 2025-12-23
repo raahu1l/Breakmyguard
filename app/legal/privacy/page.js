@@ -1,41 +1,62 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function PrivacyPage() {
+  const router = useRouter();
+
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+    <div className="min-h-screen bg-black text-zinc-200 px-6 py-12">
+      <div className="max-w-3xl mx-auto font-mono">
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => router.back()}
+            className="text-xs tracking-widest text-zinc-400 hover:text-emerald-400 transition"
+          >
+            &lt; BACK
+          </button>
 
-      <p className="mb-4">
-        Break My Guard respects your privacy. We do not store chat conversations
-        or personal messages.
-      </p>
+          <div className="text-xs tracking-widest text-zinc-500">
+            SYSTEM DOCUMENT
+          </div>
+        </div>
 
-      <h2 className="text-xl font-semibold mt-8 mb-2">
-        What We Collect
-      </h2>
+        <h1 className="text-3xl text-emerald-400 font-bold mb-8">
+          PRIVACY POLICY
+        </h1>
 
-      <ul className="list-disc ml-6 space-y-2">
-        <li>Anonymous gameplay statistics (wins, losses, categories)</li>
-        <li>Optional nickname stored locally in your browser</li>
-        <li>Anonymous feedback ratings</li>
-      </ul>
+        <p className="mb-6 text-sm text-zinc-300">
+          Break My Guard is a game. We collect the minimum data required to
+          operate and improve the experience.
+        </p>
 
-      <h2 className="text-xl font-semibold mt-8 mb-2">
-        What We Do NOT Collect
-      </h2>
+        <ul className="space-y-4 text-sm">
+          <li>
+            <span className="text-emerald-300">• Gameplay Data:</span>{' '}
+            Anonymous round results, difficulty signals, and feedback.
+          </li>
 
-      <ul className="list-disc ml-6 space-y-2">
-        <li>Chat messages or prompts</li>
-        <li>Email addresses or passwords</li>
-        <li>Real-world identity data</li>
-      </ul>
+          <li>
+            <span className="text-emerald-300">• No Personal Identity:</span>{' '}
+            We do not collect names, emails, or real-world identifiers.
+          </li>
 
-      <p className="mt-6">
-        All gameplay data is anonymized and used only to improve difficulty
-        balancing and game experience.
-      </p>
+          <li>
+            <span className="text-emerald-300">• Storage:</span>{' '}
+            Data may be stored temporarily for balancing and analytics.
+          </li>
 
-      <p className="mt-4 text-zinc-400 text-sm">
-        Last updated: {new Date().toLocaleDateString()}
-      </p>
-    </>
+          <li>
+            <span className="text-emerald-300">• Third Parties:</span>{' '}
+            External feedback links follow their own privacy policies.
+          </li>
+        </ul>
+
+        <p className="mt-8 text-xs text-zinc-500">
+          By using the game, you agree to this policy.
+        </p>
+      </div>
+    </div>
   );
 }

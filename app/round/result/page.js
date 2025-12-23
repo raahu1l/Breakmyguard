@@ -21,11 +21,12 @@ export default function ResultPage() {
   if (!result) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center px-4">
       <ResultCard
-        userWon={result.userWon}
+        win={result.userWon}          // ✅ correct prop
         category={result.category}
-        timeTaken={result.timeTaken}
+        roundId={result.roundId || null}
+        playerId={result.playerId || null}
         onNext={() => router.push('/round/match')}
         onExit={() => router.push('/')}
       />

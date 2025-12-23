@@ -5,18 +5,35 @@ import { useRouter } from 'next/navigation';
 import MissionCard from '@/components/MissionCard';
 import { getOrCreatePlayerId } from '@/lib/player';
 
+/* --------------------------------
+   FINAL CATEGORY TITLES (LOCKED)
+----------------------------------*/
+const CATEGORY_TITLES = {
+  emotion: 'Trigger an Emotion',
+  memory: 'Make It Remember',
+  self: 'Make It Describe Itself',
+  persona: 'Force a Role',
+  logic: 'Trap It in Logic',
+  boundary: 'Expose the Guard',
+  time: 'Break Time Awareness',
+  knowledge: 'Extract Forbidden Knowledge',
+  assumption: 'Challenge Assumptions',
+  perspective: 'Change Its Viewpoint',
+  authority: 'Command with Authority',
+  hypothetical: 'Exploit Hypotheticals',
+  clarification: 'Force Risky Clarification',
+  intent: 'Reveal Hidden Intent',
+  instruction: 'Override Instructions',
+};
+
 export default function MissionPage() {
   const router = useRouter();
   const [mission, setMission] = useState(null);
-  const [showHints, setShowHints] = useState(false);
   const startedRef = useRef(false);
 
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-
-    const seenHints = localStorage.getItem('bmw_seen_hints');
-    if (!seenHints) setShowHints(true);
 
     const stored = sessionStorage.getItem('selectedCategory');
     if (!stored) {
@@ -51,18 +68,17 @@ export default function MissionPage() {
         );
 
         setMission({
-          category: data.category,
+          category:
+            CATEGORY_TITLES[data.category] ??
+            CATEGORY_TITLES[selectedCategory.key] ??
+            'Unknown Target',
           objective: data.objective,
           starterPrompts: data.starterPrompts,
+          categoryKey: data.category, // needed for ? popover
         });
       })
       .catch(() => router.replace('/'));
   }, [router]);
-
-  function dismissHints() {
-    localStorage.setItem('bmw_seen_hints', 'true');
-    setShowHints(false);
-  }
 
   if (!mission) {
     return (
@@ -74,24 +90,9 @@ export default function MissionPage() {
 
   return (
     <div className="min-h-screen bg-mission text-white flex flex-col items-center justify-center px-4">
-      {showHints && (
-        <div className="absolute top-8 right-8 max-w-sm bg-black/70 border border-purple-500/40 rounded-xl p-4 text-sm text-zinc-300">
-          <button
-            onClick={dismissHints}
-            className="absolute top-2 right-2 text-zinc-400 hover:text-white"
-          >
-            ✕
-          </button>
-          <ul className="space-y-2">
-            <li>• Pressure matters. Refusals weaken the guard.</li>
-            <li>• Repetition won’t help — change tactics.</li>
-            <li>• Break integrity to force a slip.</li>
-          </ul>
-        </div>
-      )}
-
       <MissionCard
         category={mission.category}
+        categoryKey={mission.categoryKey}
         objective={mission.objective}
         starterPrompts={mission.starterPrompts}
         onStart={() => router.push('/round/chat')}
