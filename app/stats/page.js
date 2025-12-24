@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getOrCreatePlayerId } from '@/lib/player';
+import SystemMetrics from '@/components/SystemMetrics';
+
 
 export default function StatsPage() {
   const router = useRouter();
@@ -10,9 +12,16 @@ export default function StatsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const id = getOrCreatePlayerId();
+    let playerId = getOrCreatePlayerId();
 
-    fetch(`/api/stats-player?playerId=${id}`)
+    // 🔒 HARD GUARANTEE (no retries, no delays)
+    if (!playerId) {
+      playerId = getOrCreatePlayerId(true);
+    }
+
+    fetch(`/api/stats-player?playerId=${encodeURIComponent(playerId)}`, {
+      cache: 'no-store',
+    })
       .then(r => (r.ok ? r.json() : Promise.reject()))
       .then(setStats)
       .catch(() => setError('Failed to load stats'));
@@ -67,56 +76,42 @@ export default function StatsPage() {
 
         {/* CORE METRICS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <CoreMetric
-            label="Successful Breaches"
-            value={stats.wins}
-            accent="emerald"
-          />
-          <CoreMetric
-            label="Failed Attempts"
-            value={stats.losses}
-            accent="red"
-          />
-          <CoreMetric
-            label="Current Streak"
-            value={stats.current_streak}
-            accent="cyan"
-          />
+          <CoreMetric label="Successful Breaches" value={stats.wins} accent="emerald" />
+          <CoreMetric label="Failed Attempts" value={stats.losses} accent="red" />
+          <CoreMetric label="Current Streak" value={stats.current_streak} accent="cyan" />
         </div>
 
         {/* SECONDARY METRICS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Panel title="Performance Highlights">
             <Row label="Best Streak" value={stats.longest_streak} />
-            <Row
-              label="Fastest Breach"
-              value={stats.fastest_break ?? '—'}
-            />
+            <Row label="Fastest Breach" value={stats.fastest_break ?? '—'} />
           </Panel>
 
           <Panel title="Skill Analysis">
-            <Row
-              label="Most Successful Category"
-              value={stats.best_category ?? '—'}
-            />
+            <Row label="Most Successful Category" value={stats.best_category ?? '—'} />
             <Row
               label="Win Rate"
               value={
                 stats.wins + stats.losses > 0
                   ? `${Math.round(
-                      (stats.wins /
-                        (stats.wins + stats.losses)) *
-                        100
+                      (stats.wins / (stats.wins + stats.losses)) * 100
                     )}%`
                   : '—'
               }
             />
           </Panel>
         </div>
+        {/* ✅ SYSTEM METRICS (FIXED LOCATION) */}
+        <div className="mt-14 bg-zinc-900/40 border border-zinc-800 rounded-xl p-6">
+          <SystemMetrics />
+        </div>
       </div>
     </div>
   );
 }
+
+
 
 /* ---------------- UI COMPONENTS ---------------- */
 
@@ -128,18 +123,13 @@ function CoreMetric({ label, value, accent }) {
   };
 
   return (
-    <div
-      className={`relative bg-zinc-900/70 backdrop-blur
-                  border rounded-2xl p-6 ${accentMap[accent]}`}
-    >
+    <div className={`relative bg-zinc-900/70 backdrop-blur border rounded-2xl p-6 ${accentMap[accent]}`}>
       <div className="text-xs uppercase tracking-wide text-zinc-400 mb-3">
         {label}
       </div>
       <div className="text-4xl font-bold">
         {value}
       </div>
-
-      <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
     </div>
   );
 }
@@ -165,3 +155,4 @@ function Row({ label, value }) {
     </div>
   );
 }
+
