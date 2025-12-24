@@ -160,8 +160,6 @@ If you find a bug, have a feature idea, or manage to break the guard in an unexp
 Break My Guard is an original game concept and implementation.
 This repository represents the first public release of the project.
 
-All rights are reserved by the author.
-
 ---
 
 ### ⭐ If you enjoy this project
@@ -172,3 +170,7 @@ Give the repo a star and challenge your friends to break the guard.
 
 **Rahul Walawalkar**  
 An indie experiment in AI, games, and prompt engineering
+
+## Status
+🚧 Actively developed — early-stage experiment
+
