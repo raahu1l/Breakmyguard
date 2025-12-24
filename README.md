@@ -7,6 +7,7 @@
 Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on the server, and your only weapon is clever prompting. No system access. No exploits. Just reasoning, creativity, and pressure.
 ---
 
+
 ## 🔴 Live Demo
 
 👉 **Play here:** https://breakmyguard.vercel.app/
