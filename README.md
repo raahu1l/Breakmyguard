@@ -6,9 +6,11 @@
 
 Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on the server, and your only weapon is clever prompting. No system access. No exploits. Just reasoning, creativity, and pressure.
 ---
-🔴 Live Demo
 
-👉 Play here: https://breakmyguard.vercel.app/
+## 🔴 Live Demo
+
+👉 **Play here:** https://breakmyguard.vercel.app/
+
 ---
 
 ## 🎮 Gameplay
@@ -32,6 +34,19 @@ Every round is different. Every win is earned.
 * Designed to be replayable and addictive
 
 > Can you outthink the AI — or will the guard hold?
+
+---
+
+## 🖥️ Screenshots
+
+### 🟢 Landing Screen
+![Landing Screen](./public/screenshots/Landing.png)
+
+### 🟢 Match Selection
+![Match Selection](./public/screenshots/Matching.png)
+
+### 🟢 Prompt Battle
+![Prompt Battle](./public/screenshots/Promptit.png)
 
 ---
 
