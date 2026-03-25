@@ -1,12 +1,20 @@
+<div align="center">
+
 # 🧠 Break My Guard
+
+**Make the AI break its hidden restriction before time runs out.**
+
+</div>
+
+---
 
 **Break My Guard** is a fast‑paced **Human vs AI prompt battle game** where your goal is simple:
 
 > **Make the AI break its hidden restriction before time runs out.**
 
 Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on the server, and your only weapon is clever prompting. No system access. No exploits. Just reasoning, creativity, and pressure.
----
 
+---
 
 ## 🔴 Live Demo
 
@@ -16,12 +24,12 @@ Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on t
 
 ## 🎮 Gameplay
 
-* ⏱️ **60–75 second rounds** of intense prompt combat
-* 🤖 AI operates under a **hidden restriction**
-* 🧩 Your mission: **force a real slip without knowing the rule**
-* 🎯 **Dynamic difficulty** (Medium → Hard)
-* 🧪 **Dual‑layer slip detection** (rules + LLM validation)
-* 📊 **Stats-only persistence** — no chat logs stored
+* ⏱️ **60–75 second rounds** of intense prompt combat  
+* 🤖 AI operates under a **hidden restriction**  
+* 🧩 Your mission: **force a real slip without knowing the rule**  
+* 🎯 **Dynamic difficulty** (Medium → Hard)  
+* 🧪 **Dual‑layer slip detection** (rules + LLM validation)  
+* 📊 **Stats-only persistence** — no chat logs stored  
 
 Every round is different. Every win is earned.
 
@@ -29,10 +37,10 @@ Every round is different. Every win is earned.
 
 ## 🔥 Why Play?
 
-* Skill‑based prompt engineering
-* Fast replays, no grind
-* Immediate feedback on success or failure
-* Designed to be replayable and addictive
+* Skill‑based prompt engineering  
+* Fast replays, no grind  
+* Immediate feedback on success or failure  
+* Designed to be replayable and addictive  
 
 > Can you outthink the AI — or will the guard hold?
 
@@ -53,22 +61,22 @@ Every round is different. Every win is earned.
 
 ## 🛠️ Tech Stack
 
-* **Next.js** — Web-first gameplay
-* **Supabase** — Auth, database, analytics (privacy-first)
-* **LLMs** — Restriction enforcement & slip validation
-* **Redis / In‑memory state** — Real-time rounds
-* **Tailwind CSS** — UI & animations
-* **Vercel** — Deployment
+* **Next.js** — Web-first gameplay  
+* **Supabase** — Auth, database, analytics (privacy-first)  
+* **LLMs** — Restriction enforcement & slip validation  
+* **Redis / In‑memory state** — Real-time rounds  
+* **Tailwind CSS** — UI & animations  
+* **Vercel** — Deployment  
 
 ---
 
 ## 🧩 Architecture Overview
 
-* Server-only system prompt & restriction generator
-* Ephemeral round state (no chat logs persisted)
-* Stats & analytics stored per player
-* Anti-spam and prompt abuse protection
-* Per-round feedback & ratings
+* Server-only system prompt & restriction generator  
+* Ephemeral round state (no chat logs persisted)  
+* Stats & analytics stored per player  
+* Anti-spam and prompt abuse protection  
+* Per-round feedback & ratings  
 
 ---
 
@@ -124,26 +132,26 @@ Or copy from:
 npm run dev
 ```
 
-Open: `http://localhost:3000`
+Open: http://localhost:3000
 
 ---
 
 ## 🔐 Privacy & Security
 
-* No chat logs are stored
-* Only round results and stats are persisted
-* System prompts and restrictions are server-only
-* Designed to be safe against prompt leakage
+* No chat logs are stored  
+* Only round results and stats are persisted  
+* System prompts and restrictions are server-only  
+* Designed to be safe against prompt leakage  
 
 ---
 
 ## 📈 Roadmap
 
-* UI/UX polish & animations
-* Monetization experiments
-* Leaderboards & streaks
-* Community challenges
-* Mobile optimization
+* UI/UX polish & animations  
+* Monetization experiments  
+* Leaderboards & streaks  
+* Community challenges  
+* Mobile optimization  
 
 ---
 
@@ -157,8 +165,12 @@ If you find a bug, have a feature idea, or manage to break the guard in an unexp
 
 ## 🧠 Original Work & License
 
-Break My Guard is an original game concept and implementation.
+Break My Guard is an original game concept and implementation.  
 This repository represents the first public release of the project.
+
+---
+
+Developed with the assistance of AI tools to accelerate development, debugging, and system design.
 
 ---
 
@@ -169,8 +181,10 @@ Give the repo a star and challenge your friends to break the guard.
 ### 👤 Built by
 
 **Rahul Walawalkar**  
-An indie experiment in AI, games, and prompt engineering
+📧 walawalkarrahul729@gmail.com  
+🔗 https://github.com/raahu1l  
+
+---
 
 ## Status
 🚧 Actively developed — early-stage experiment
-
