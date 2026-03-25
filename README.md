@@ -16,9 +16,18 @@
 
 ---
 
-## 🏆 CHALLENGE
+## 🏆 Challenge
 
+> **Think you're good at prompt engineering?**
 > **Can you break the AI before time runs out?**
+
+- Can you break the AI in under 60 seconds?
+- Can you do it without obvious tricks?
+- Can you beat Hard mode consistently?
+
+👉 Share your best prompts.
+
+---
 
 - ⏱️ Beat the AI in under 60 seconds  
 - 🧠 Outsmart hidden restrictions  
