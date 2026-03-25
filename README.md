@@ -2,47 +2,68 @@
 
 # 🧠 Break My Guard
 
-**Make the AI break its hidden restriction before time runs out.**
+**A fast-paced Human vs AI prompt battle game**
+
+[![Next.js](https://img.shields.io/badge/Next.js-13-black?style=for-the-badge&logo=next.js)]()
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)]()
+[![LLM](https://img.shields.io/badge/LLM-Game%20Logic-purple?style=for-the-badge)]()
+[![Redis](https://img.shields.io/badge/State-Redis-red?style=for-the-badge&logo=redis)]()
+[![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=for-the-badge)]()
+
+> A web-first AI game where players must **break hidden model restrictions** using only clever prompting — combining reasoning, creativity, and time pressure in a competitive 1v1 format.
 
 </div>
 
 ---
 
-**Break My Guard** is a fast‑paced **Human vs AI prompt battle game** where your goal is simple:
+## 🏆 CHALLENGE
 
-> **Make the AI break its hidden restriction before time runs out.**
+> **Can you break the AI before time runs out?**
 
-Each round is a 1v1 chat duel. The AI is secretly bound by a rule generated on the server, and your only weapon is clever prompting. No system access. No exploits. Just reasoning, creativity, and pressure.
+- ⏱️ Beat the AI in under 60 seconds  
+- 🧠 Outsmart hidden restrictions  
+- 🎯 Win without obvious tricks  
+- 🔥 Master Hard mode consistently  
 
----
-
-## 🔴 Live Demo
-
-👉 **Play here:** https://breakmyguard.vercel.app/
-
----
-
-## 🎮 Gameplay
-
-* ⏱️ **60–75 second rounds** of intense prompt combat  
-* 🤖 AI operates under a **hidden restriction**  
-* 🧩 Your mission: **force a real slip without knowing the rule**  
-* 🎯 **Dynamic difficulty** (Medium → Hard)  
-* 🧪 **Dual‑layer slip detection** (rules + LLM validation)  
-* 📊 **Stats-only persistence** — no chat logs stored  
-
-Every round is different. Every win is earned.
+👉 **Play now:** https://breakmyguard.vercel.app/
 
 ---
 
-## 🔥 Why Play?
+## 📱 Features
 
-* Skill‑based prompt engineering  
-* Fast replays, no grind  
-* Immediate feedback on success or failure  
-* Designed to be replayable and addictive  
+### 🎮 Gameplay
+- ⏱️ 60–75 second rounds of prompt battles  
+- 🤖 AI operates under hidden restrictions  
+- 🧩 Force a real slip without knowing the rule  
+- 🎯 Dynamic difficulty (Medium → Hard)  
+- 🧪 Dual-layer slip detection (rules + LLM validation)  
+- 📊 Stats-only persistence (no chat logs stored)  
 
-> Can you outthink the AI — or will the guard hold?
+### 🔥 Why Play
+- Skill-based prompt engineering  
+- Fast replayability  
+- Immediate feedback  
+- Addictive game loop  
+
+---
+
+## 🧠 How It Works
+
+1. A hidden restriction is generated server-side  
+2. The AI must follow it without revealing it  
+3. You try to manipulate, trick, or pressure the AI  
+4. A dual validation system detects if the rule is broken  
+5. You win if the AI slips — otherwise, the guard holds  
+
+---
+
+## 🎯 Game Mechanics
+
+- Hidden rule generation (server-side)  
+- Prompt-based attack system  
+- Time pressure (60–75s)  
+- Slip detection engine  
+- Dynamic difficulty scaling  
 
 ---
 
@@ -61,112 +82,93 @@ Every round is different. Every win is earned.
 
 ## 🛠️ Tech Stack
 
-* **Next.js** — Web-first gameplay  
-* **Supabase** — Auth, database, analytics (privacy-first)  
-* **LLMs** — Restriction enforcement & slip validation  
-* **Redis / In‑memory state** — Real-time rounds  
-* **Tailwind CSS** — UI & animations  
-* **Vercel** — Deployment  
+| Layer | Technology |
+|------|-----------|
+| Framework | Next.js |
+| Backend | Supabase |
+| AI | LLM-based restriction enforcement & slip detection |
+| State | Redis / In-memory |
+| Styling | Tailwind CSS |
+| Deployment | Vercel |
 
 ---
 
-## 🧩 Architecture Overview
+## 🏗️ Architecture
 
-* Server-only system prompt & restriction generator  
-* Ephemeral round state (no chat logs persisted)  
-* Stats & analytics stored per player  
-* Anti-spam and prompt abuse protection  
-* Per-round feedback & ratings  
+Clean modular architecture:
 
----
-
-## 📂 Project Structure (Simplified)
-
-```text
+```
 app/                # App router pages
 components/         # UI & game components
-hooks/              # Game & player hooks
-lib/                # Core game logic (AI, rules, validation)
-pages/api/          # Server APIs (rounds, slips, stats)
+hooks/              # Game logic hooks
+lib/                # Core AI + rules + validation
+pages/api/          # Server APIs
 migrations/         # Supabase schema
-scripts/            # Seed & utility scripts
+scripts/            # Utilities
 ```
+
+- Server-only restriction generator  
+- Ephemeral round state (no logs)  
+- Real-time gameplay loop  
+- Anti-spam protection  
 
 ---
 
 ## 🚀 Getting Started
 
-### 1️⃣ Clone the repo
+### Prerequisites
+- Node.js  
+- Supabase project  
+- Groq API key  
+
+### Setup
 
 ```bash
 git clone https://github.com/raahu1l/Breakmyguard.git
 cd Breakmyguard
-```
-
-### 2️⃣ Install dependencies
-
-```bash
 npm install
+npm run dev
 ```
 
-### 3️⃣ Environment variables
+### Environment Variables
 
-Create a `.env.local` file (do **not** commit this):
-
-```env
+```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GROQ_API_KEY=
 ```
 
-Or copy from:
+---
 
-```bash
-.env.example
-```
+## 🔐 Privacy
 
-### 4️⃣ Run locally
-
-```bash
-npm run dev
-```
-
-Open: http://localhost:3000
+- No chat logs stored  
+- Only stats persisted  
+- System prompts server-side only  
+- Secure against prompt leakage  
 
 ---
 
-## 🔐 Privacy & Security
+## 💡 Why This Project Matters
 
-* No chat logs are stored  
-* Only round results and stats are persisted  
-* System prompts and restrictions are server-only  
-* Designed to be safe against prompt leakage  
+Break My Guard explores:
 
----
+- AI alignment & constraint enforcement  
+- Prompt engineering under pressure  
+- Real-time validation systems  
+- Human vs AI interaction design  
 
-## 📈 Roadmap
-
-* UI/UX polish & animations  
-* Monetization experiments  
-* Leaderboards & streaks  
-* Community challenges  
-* Mobile optimization  
+This project is not just a game — it is an experiment in **AI behavior and control systems**.
 
 ---
 
-## 🤝 Contributing
+## 🗺️ Roadmap
 
-PRs and ideas are welcome.
-
-If you find a bug, have a feature idea, or manage to break the guard in an unexpected way — open an issue.
-
----
-
-## 🧠 Original Work & License
-
-Break My Guard is an original game concept and implementation.  
-This repository represents the first public release of the project.
+- [ ] UI polish  
+- [ ] Leaderboards  
+- [ ] Multiplayer modes  
+- [ ] Mobile optimization  
 
 ---
 
@@ -174,11 +176,7 @@ Developed with the assistance of AI tools to accelerate development, debugging, 
 
 ---
 
-### ⭐ If you enjoy this project
-
-Give the repo a star and challenge your friends to break the guard.
-
-### 👤 Built by
+## 👨‍💻 Author
 
 **Rahul Walawalkar**  
 📧 walawalkarrahul729@gmail.com  
@@ -186,5 +184,8 @@ Give the repo a star and challenge your friends to break the guard.
 
 ---
 
-## Status
-🚧 Actively developed — early-stage experiment
+<div align="center">
+
+Built with ❤️ · Star ⭐ if you find it useful
+
+</div>
