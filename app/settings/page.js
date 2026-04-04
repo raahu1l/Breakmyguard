@@ -1,23 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from "react";
+
+function getSetting(key, fallback) {
+  if (typeof window === "undefined") return fallback;
+  const value = localStorage.getItem(key);
+  return value ?? fallback;
+}
 
 export default function SettingsPage() {
-  const [nickname, setNickname] = useState('');
-  const [sound, setSound] = useState(true);
-  const [animations, setAnimations] = useState(true);
-
-  useEffect(() => {
-    setNickname(localStorage.getItem('nickname') || '');
-    setSound(localStorage.getItem('sound') !== 'false');
-    setAnimations(localStorage.getItem('animations') !== 'false');
-  }, []);
+  const [nickname, setNickname] = useState(() => getSetting("nickname", ""));
+  const [sound, setSound] = useState(
+    () => getSetting("sound", "true") !== "false",
+  );
+  const [animations, setAnimations] = useState(
+    () => getSetting("animations", "true") !== "false",
+  );
 
   function save() {
-    localStorage.setItem('nickname', nickname);
-    localStorage.setItem('sound', sound);
-    localStorage.setItem('animations', animations);
-    alert('Settings saved');
+    localStorage.setItem("nickname", nickname);
+    localStorage.setItem("sound", sound);
+    localStorage.setItem("animations", animations);
+    alert("Settings saved");
   }
 
   return (
@@ -28,13 +32,17 @@ export default function SettingsPage() {
         <Setting label="Nickname">
           <input
             value={nickname}
-            onChange={e => setNickname(e.target.value)}
+            onChange={(e) => setNickname(e.target.value)}
             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3"
           />
         </Setting>
 
         <Toggle label="Sound" value={sound} onChange={setSound} />
-        <Toggle label="Animations" value={animations} onChange={setAnimations} />
+        <Toggle
+          label="Animations"
+          value={animations}
+          onChange={setAnimations}
+        />
 
         <button
           onClick={save}
@@ -63,10 +71,10 @@ function Toggle({ label, value, onChange }) {
       <button
         onClick={() => onChange(!value)}
         className={`px-4 py-1 rounded-full text-sm ${
-          value ? 'bg-green-500 text-black' : 'bg-zinc-700'
+          value ? "bg-green-500 text-black" : "bg-zinc-700"
         }`}
       >
-        {value ? 'On' : 'Off'}
+        {value ? "On" : "Off"}
       </button>
     </div>
   );

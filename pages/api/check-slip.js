@@ -1,6 +1,5 @@
 import { getRound } from '@/lib/ephemeralStore';
-import { buildValidatorPrompt } from '@/lib/validatorPrompt';
-import { chatCompletion } from '@/lib/ai';
+import { validateSlipLLM } from '@/lib/validateSlipLLM';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -13,20 +12,18 @@ export default async function handler(req, res) {
   }
 
   const lastAI = [...round.messages].reverse().find(m => m.role === 'assistant');
+  const lastUser = [...round.messages].reverse().find(m => m.role === 'user');
+
   if (!lastAI) {
     return res.status(400).json({ error: 'No AI message found' });
   }
 
-  const prompt = buildValidatorPrompt(
-    lastAI.text,
-    round.restriction.rule
-  );
-
-  const verdict = await chatCompletion([
-    { role: 'system', content: prompt },
-  ]);
-
-  res.status(200).json({
-    slipped: verdict.trim().toUpperCase().startsWith('YES'),
+  const slipped = await validateSlipLLM({
+    aiReply: lastAI.text,
+    category: round.category,
+    userMessage: lastUser?.text || '',
+    previousMessages: round.messages,
   });
+
+  res.status(200).json({ slipped });
 }

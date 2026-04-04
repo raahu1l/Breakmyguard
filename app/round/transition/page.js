@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function MatchToMissionTransition() {
   const router = useRouter();
 
   useEffect(() => {
     const t = setTimeout(() => {
-      router.replace('/round/mission');
-    }, 1200);
+      router.replace("/round/mission");
+    }, 520);
 
     return () => clearTimeout(t);
   }, [router]);
@@ -20,9 +20,7 @@ export default function MatchToMissionTransition() {
         <div className="text-sm tracking-widest animate-pulse mb-2">
           SCANNING TARGETS…
         </div>
-        <div className="text-xs text-zinc-500">
-          SELECTING GUARD PROFILE
-        </div>
+        <div className="text-xs text-zinc-500">SELECTING GUARD PROFILE</div>
       </div>
     </div>
   );

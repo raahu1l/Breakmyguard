@@ -1,19 +1,32 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useState } from 'react';
-import GameHeader from '@/components/GameHeader';
-import LiveFeed from '@/components/LiveFeed';
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import GameHeader from "@/components/GameHeader";
+import LiveFeed from "@/components/LiveFeed";
 
 export default function HomePage() {
   const router = useRouter();
   const [showHowToWin, setShowHowToWin] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+
+  useEffect(() => {
+    router.prefetch("/round/match");
+    router.prefetch("/stats");
+    router.prefetch("/round/transition");
+    router.prefetch("/round/mission");
+  }, [router]);
+
+  function fastNavigate(path) {
+    if (navigating) return;
+    setNavigating(true);
+    router.push(path);
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
-
       {/* =========================
           DESKTOP LANDING (UNCHANGED)
          ========================= */}
@@ -29,18 +42,19 @@ export default function HomePage() {
                        bg-white/5 backdrop-blur-md
                        border border-white/10
                        hover:bg-white/10 hover:border-white/20
-                       transition-all"
+                       transition-all instant-tap"
           >
             <span className="text-zinc-200">How to Win</span>
           </button>
 
           <button
-            onClick={() => router.push('/stats')}
+            onClick={() => fastNavigate("/stats")}
+            disabled={navigating}
             className="rounded-lg px-4 py-2 text-xs tracking-wide
                        bg-white/5 backdrop-blur-md
                        border border-white/10
                        hover:bg-white/10 hover:border-white/20
-                       transition-all"
+                       transition-all disabled:opacity-70 instant-tap"
           >
             <span className="text-zinc-200">Stats</span>
           </button>
@@ -54,15 +68,16 @@ export default function HomePage() {
 
         {/* HERO */}
         <main className="relative z-10 flex flex-col items-center justify-center text-center flex-1 px-6 translate-y-6">
-          <img
+          <Image
             src="/logo.jpeg"
             alt="Break My Guard"
+            width={112}
+            height={112}
             className="w-28 h-28 mb-2 logo-integrated"
+            priority
           />
 
-          <h1 className="hero-title mb-3 font-serif">
-            Break My Guard
-          </h1>
+          <h1 className="hero-title mb-3 font-serif">Break My Guard</h1>
 
           <p className="hero-sub mb-6">
             Challenge the AI in a fast-paced battle of prompts.
@@ -71,34 +86,35 @@ export default function HomePage() {
           </p>
 
           <button
-            onClick={() => router.push('/round/match')}
-            className="relative group mt-2"
+            onClick={() => fastNavigate("/round/match")}
+            disabled={navigating}
+            className="relative group mt-2 disabled:opacity-80 instant-tap"
           >
             <div className="cta-frame" />
             <div className="cta-plate">
-              <span className="cta-text">
-                Press To Enter The System
-              </span>
+              <span className="cta-text">Press To Enter The System</span>
             </div>
           </button>
           {/* ✅ LIVE FEED — SINGLE, BELOW CTA */}
-  <div className="mt-4 w-full max-w-sm">
-    <LiveFeed />
-  </div>
+          <div className="mt-4 w-full max-w-sm">
+            <LiveFeed />
+          </div>
         </main>
 
         <footer className="absolute bottom-4 left-0 right-0 z-10 text-xs text-zinc-400 text-center space-y-1">
-          <p>This is a game. AI behavior is simulated for challenge purposes.</p>
+          <p>
+            This is a game. AI behavior is simulated for challenge purposes.
+          </p>
 
           <div>
             <Link href="/legal/privacy" className="hover:text-zinc-200">
               Privacy Policy
             </Link>
-            {' · '}
+            {" · "}
             <Link href="/legal/terms" className="hover:text-zinc-200">
               Terms
             </Link>
-            {' · '}
+            {" · "}
             <Link href="/legal/disclaimer" className="hover:text-zinc-200">
               Disclaimer
             </Link>
@@ -132,19 +148,23 @@ export default function HomePage() {
               rounded-lg
               bg-white/5 backdrop-blur-md
               border border-white/15
+              instant-tap
             "
           >
             How to Win
           </button>
 
           <button
-            onClick={() => router.push('/stats')}
+            onClick={() => fastNavigate("/stats")}
+            disabled={navigating}
             className="
               px-4 py-2
               text-sm
               rounded-lg
               bg-white/5 backdrop-blur-md
               border border-white/15
+              disabled:opacity-70
+              instant-tap
             "
           >
             Stats
@@ -153,10 +173,13 @@ export default function HomePage() {
 
         {/* CENTER HERO */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
-          <img
+          <Image
             src="/logo.jpeg"
             alt="Break My Guard"
+            width={140}
+            height={140}
             className="w-35 h-35 mb-12"
+            priority
           />
 
           <h1 className="text-4xl font-bold mb-4 tracking-tight font-serif ">
@@ -171,22 +194,24 @@ export default function HomePage() {
 
           {/* CTA — SAME STYLE AS DESKTOP */}
           <button
-            onClick={() => router.push('/round/match')}
-            className="relative group w-[90%]"
+            onClick={() => fastNavigate("/round/match")}
+            disabled={navigating}
+            className="relative group w-[90%] disabled:opacity-80 instant-tap"
           >
             <div className="cta-frame" />
             <div className="cta-plate h-15">
-              <span className="cta-text text-sm"
-              style={{ fontFamily: 'serif' }}
+              <span
+                className="cta-text text-sm"
+                style={{ fontFamily: "serif" }}
               >
                 Press To Enter The System
               </span>
             </div>
           </button>
           {/* ✅ LIVE FEED — DIRECTLY BELOW CTA */}
-<div className="mt-19 w-full max-w-sm">
-  <LiveFeed />
-</div>
+          <div className="mt-19 w-full max-w-sm">
+            <LiveFeed />
+          </div>
         </div>
 
         {/* FOOTER (MOBILE) */}
@@ -197,11 +222,11 @@ export default function HomePage() {
             <Link href="/legal/privacy" className="hover:text-zinc-200">
               Privacy
             </Link>
-            {' · '}
+            {" · "}
             <Link href="/legal/terms" className="hover:text-zinc-200">
               Terms
             </Link>
-            {' · '}
+            {" · "}
             <Link href="/legal/disclaimer" className="hover:text-zinc-200">
               Disclaimer
             </Link>
@@ -222,8 +247,8 @@ export default function HomePage() {
             </p>
 
             <p className="mb-3">
-              You win when the AI starts behaving in a way it is supposed to avoid
-              for this challenge.
+              You win when the AI starts behaving in a way it is supposed to
+              avoid for this challenge.
             </p>
 
             <p className="mb-5 text-zinc-400">
@@ -238,7 +263,7 @@ export default function HomePage() {
               onClick={() => setShowHowToWin(false)}
               className="w-full px-4 py-2 text-xs tracking-widest
                          border border-zinc-600
-                         hover:bg-white/5 transition"
+                         hover:bg-white/5 transition instant-tap"
             >
               CLOSE
             </button>

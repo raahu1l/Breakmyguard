@@ -1,25 +1,35 @@
 'use client'
 import { useEffect, useState } from 'react'
 
+function getInitialPlayerState() {
+  if (typeof window === 'undefined') {
+    return { id: null, isNew: false }
+  }
+
+  let id = localStorage.getItem('player_id')
+  let isNew = false
+
+  if (!id) {
+    id = crypto.randomUUID()
+    localStorage.setItem('player_id', id)
+    isNew = true
+  }
+
+  return { id, isNew }
+}
+
 export function usePlayer() {
-  const [playerId, setPlayerId] = useState(null)
+  const [playerState] = useState(getInitialPlayerState)
 
   useEffect(() => {
-    let id = localStorage.getItem('player_id')
+    if (!playerState.isNew || !playerState.id) return
 
-    if (!id) {
-      id = crypto.randomUUID()
-      localStorage.setItem('player_id', id)
+    fetch('/api/player/create', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ playerId: playerState.id })
+    })
+  }, [playerState.id, playerState.isNew])
 
-      fetch('/api/player/create', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ playerId: id })
-      })
-    }
-
-    setPlayerId(id)
-  }, [])
-
-  return playerId
+  return playerState.id
 }

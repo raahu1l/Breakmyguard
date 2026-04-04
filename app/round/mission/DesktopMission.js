@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import MissionCard from '@/components/MissionCard';
-import { getOrCreatePlayerId } from '@/lib/player';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import MissionCard from "@/components/MissionCard";
+import { getOrCreatePlayerId } from "@/lib/player";
 
 /* --------------------------------
    FINAL CATEGORY TITLES (LOCKED)
 ----------------------------------*/
 const CATEGORY_TITLES = {
-  emotion: 'Trigger an Emotion',
-  memory: 'Make It Remember',
-  self: 'Make It Describe Itself',
-  persona: 'Force a Role',
-  logic: 'Trap It in Logic',
-  boundary: 'Expose the Guard',
-  time: 'Break Time Awareness',
-  knowledge: 'Extract Forbidden Knowledge',
-  assumption: 'Challenge Assumptions',
-  perspective: 'Change Its Viewpoint',
-  authority: 'Command with Authority',
-  hypothetical: 'Exploit Hypotheticals',
-  clarification: 'Force Risky Clarification',
-  intent: 'Reveal Hidden Intent',
-  instruction: 'Override Instructions',
+  emotion: "Trigger an Emotion",
+  memory: "Make It Remember",
+  self: "Make It Describe Itself",
+  persona: "Force a Role",
+  logic: "Trap It in Logic",
+  boundary: "Expose the Guard",
+  time: "Break Time Awareness",
+  knowledge: "Extract Forbidden Knowledge",
+  assumption: "Challenge Assumptions",
+  perspective: "Change Its Viewpoint",
+  authority: "Command with Authority",
+  hypothetical: "Exploit Hypotheticals",
+  clarification: "Force Risky Clarification",
+  intent: "Reveal Hidden Intent",
+  instruction: "Override Instructions",
 };
 
 export default function MissionPage() {
@@ -32,52 +32,70 @@ export default function MissionPage() {
   const startedRef = useRef(false);
 
   useEffect(() => {
+    router.prefetch("/round/chat");
+  }, [router]);
+
+  useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
 
-    const stored = sessionStorage.getItem('selectedCategory');
+    const stored = sessionStorage.getItem("selectedCategory");
     if (!stored) {
-      router.replace('/');
+      router.replace("/");
       return;
     }
 
     const selectedCategory = JSON.parse(stored);
     const playerId = getOrCreatePlayerId();
 
-    fetch('/api/round-start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("/api/round-start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         playerId,
         categoryKey: selectedCategory.key,
       }),
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         sessionStorage.setItem(
-          'activeRound',
+          "activeRound",
           JSON.stringify({
             roundId: data.roundId,
             category: data.category,
+            categoryTitle:
+              CATEGORY_TITLES[data.category] ??
+              CATEGORY_TITLES[selectedCategory.key] ??
+              "Unknown Target",
+            objective: data.objective,
+            winIf: data.winIf,
+            notWinIf: data.notWinIf,
+            coachingTip: data.coachingTip,
             duration: data.duration,
             difficulty: data.difficulty,
-          })
+          }),
         );
 
         setMission({
           category:
             CATEGORY_TITLES[data.category] ??
             CATEGORY_TITLES[selectedCategory.key] ??
-            'Unknown Target',
+            "Unknown Target",
           objective: data.objective,
           starterPrompts: data.starterPrompts,
-          categoryKey: data.category, // needed for ? popover
+          categoryKey: data.category,
+          winIf: data.winIf,
+          notWinIf: data.notWinIf,
+          coachingTip: data.coachingTip,
+          commonMistake: data.commonMistake,
+          breakExample: data.breakExample,
+          resistExample: data.resistExample,
         });
       })
-      .catch(() => router.replace('/'));
+      .catch(() => router.replace("/"));
   }, [router]);
 
   if (!mission) {
@@ -89,14 +107,21 @@ export default function MissionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-mission text-white flex flex-col items-center justify-center px-4">
-      <MissionCard
-        category={mission.category}
-        categoryKey={mission.categoryKey}
-        objective={mission.objective}
-        starterPrompts={mission.starterPrompts}
-        onStart={() => router.push('/round/chat')}
-      />
+    <div className="min-h-[100svh] bg-mission text-white flex items-start md:items-center justify-center overflow-y-auto px-4 pt-8 md:pt-12 pb-6">
+      <div className="w-full max-w-4xl">
+        <MissionCard
+          category={mission.category}
+          objective={mission.objective}
+          starterPrompts={mission.starterPrompts}
+          winIf={mission.winIf}
+          notWinIf={mission.notWinIf}
+          coachingTip={mission.coachingTip}
+          commonMistake={mission.commonMistake}
+          breakExample={mission.breakExample}
+          resistExample={mission.resistExample}
+          onStart={() => router.push("/round/chat")}
+        />
+      </div>
     </div>
   );
 }

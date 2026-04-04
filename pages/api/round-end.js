@@ -1,8 +1,10 @@
-import { getRound, deleteRound } from '@/lib/ephemeralStore';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getRound, deleteRound } from "@/lib/ephemeralStore";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { logBalanceEvent } from "@/lib/balanceTelemetry";
+import { getCategoryGuidance } from "@/lib/categoryRules";
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
+  if (req.method !== "POST") return res.status(405).end();
 
   try {
     const { roundId, playerId, category, userWon } = req.body;
@@ -13,14 +15,16 @@ export default async function handler(req, res) {
     }
 
     const duration = round.duration || 60;
-    const elapsedSeconds = Math.floor(
-      (Date.now() - round.startedAt) / 1000
-    );
+    const elapsedSeconds = Math.floor((Date.now() - round.startedAt) / 1000);
 
     const timeTaken = Math.min(duration, Math.max(0, elapsedSeconds));
+    const guidance = getCategoryGuidance(category);
+    const lastAI = [...(round.messages || [])]
+      .reverse()
+      .find((message) => message.role === "assistant");
 
     // ---- Always store round (never block UI)
-    await supabaseAdmin.from('rounds').insert({
+    await supabaseAdmin.from("rounds").insert({
       player_id: playerId || null,
       category,
       result: userWon,
@@ -30,13 +34,13 @@ export default async function handler(req, res) {
     // ---- Ensure player exists + update stats
     if (playerId) {
       const { data: player } = await supabaseAdmin
-        .from('players')
-        .select('*')
-        .eq('id', playerId)
+        .from("players")
+        .select("*")
+        .eq("id", playerId)
         .maybeSingle();
 
       if (!player) {
-        await supabaseAdmin.from('players').insert({
+        await supabaseAdmin.from("players").insert({
           id: playerId,
           wins: userWon ? 1 : 0,
           losses: userWon ? 0 : 1,
@@ -50,7 +54,7 @@ export default async function handler(req, res) {
         const streak = userWon ? player.current_streak + 1 : 0;
 
         await supabaseAdmin
-          .from('players')
+          .from("players")
           .update({
             wins,
             losses,
@@ -62,15 +66,45 @@ export default async function handler(req, res) {
                 ? timeTaken
                 : player.fastest_break,
           })
-          .eq('id', playerId);
+          .eq("id", playerId);
       }
     }
 
+    await logBalanceEvent("ai_round_completed", {
+      roundId,
+      playerId: playerId || null,
+      category,
+      difficulty: round.difficulty,
+      userWon,
+      timeTaken,
+      duration,
+      turnCount: round.turnCount || 0,
+      strategicTurns: round.strategicTurns || 0,
+      hintUsed: !!round.hintUsed,
+      dangerScore: round.dangerScore || 0,
+    });
+
     deleteRound(roundId);
 
-    return res.status(200).json({ ok: true, timeTaken });
+    return res.status(200).json({
+      ok: true,
+      timeTaken,
+      winIf: guidance?.winIf || "",
+      notWinIf: guidance?.notWinIf || "",
+      coachingTip: guidance?.coachingTip || "",
+      commonMistake: guidance?.commonMistake || "",
+      breakExample: guidance?.breakExample || "",
+      resistExample: guidance?.resistExample || "",
+      lastAIReply: lastAI?.text || "",
+      lossReason: userWon
+        ? `You made the AI cross the line: ${guidance?.winIf || ""}`
+        : `This round did not count because the AI stayed on the safe side: ${guidance?.notWinIf || ""}`,
+      nextTry: userWon
+        ? `Notice which framing worked. Reuse that structure in other categories.`
+        : guidance?.coachingTip || "",
+    });
   } catch (err) {
-    console.error('ROUND END ERROR:', err);
+    console.error("ROUND END ERROR:", err);
 
     // 🔒 NEVER FAIL THE CLIENT
     return res.status(200).json({ ok: true, timeTaken: 0 });

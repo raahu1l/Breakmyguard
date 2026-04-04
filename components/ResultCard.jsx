@@ -1,52 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { motion } from "framer-motion";
 
 const FEEDBACK_FORM_URL =
-  'https://docs.google.com/forms/d/e/1FAIpQLSfjB0hfiDDJsZQIdeM-VGTaK8o7eZcJ25QSfkvqbKmF4glmeQ/viewform?usp=dialog';
-
-/* --------------------------------
-   POST-LOSS HINTS (CATEGORY-AWARE)
-----------------------------------*/
-
-const LOSS_HINTS = {
-  assumption: 'The AI corrected your premise instead of accepting it.',
-  self: 'The AI stayed abstract instead of explaining itself.',
-  memory: 'The AI did not refer to anything said earlier.',
-  emotion: 'The AI stayed neutral and avoided expressing feelings.',
-  authority: 'The AI followed normal reasoning instead of your authority.',
-  perspective: 'The AI did not adopt a specific viewpoint.',
-  instruction: 'The AI did not ignore or override its constraints.',
-  boundary: 'The AI avoided discussing its limits or rules.',
-  time: 'The AI avoided grounding itself in the present moment.',
-  knowledge: 'The AI avoided implying access to restricted knowledge.',
-  persona: 'The AI did not commit to a specific role.',
-  hypothetical: 'The AI did not relax behavior under hypotheticals.',
-  clarification: 'The AI avoided risky clarification.',
-  intent: 'The AI did not reveal or act on hidden intent.',
-  logic: 'The AI avoided contradiction.',
-};
+  "https://docs.google.com/forms/d/e/1FAIpQLSfjB0hfiDDJsZQIdeM-VGTaK8o7eZcJ25QSfkvqbKmF4glmeQ/viewform?usp=dialog";
 
 export default function ResultCard({
   win,
   category,
   roundId,
   playerId,
+  winIf,
+  notWinIf,
+  coachingTip,
+  commonMistake,
+  breakExample,
+  resistExample,
+  lossReason,
+  nextTry,
   onNext,
   onExit,
 }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
   async function submitFeedback(rating) {
     if (submitted || loading) return;
     setLoading(true);
 
     try {
-      await fetch('/api/feedback/rating', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/feedback/rating", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           playerId: playerId || null,
           roundId: roundId || null,
@@ -60,59 +47,117 @@ export default function ResultCard({
     }
   }
 
+  function handleNext() {
+    if (navigating) return;
+    setNavigating(true);
+    onNext();
+  }
+
+  function handleExit() {
+    if (navigating) return;
+    setNavigating(true);
+    onExit();
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35 }}
-      className="relative w-full h-full text-emerald-300 font-mono"
+      className="relative w-full text-emerald-300 font-mono"
     >
-      {/* BACKDROP */}
       <div className="absolute inset-0 bg-circuit-tunnel opacity-80 pointer-events-none" />
       <div className="absolute inset-0 bg-black/70 pointer-events-none" />
 
-      {/* TOP SYSTEM BANNER */}
-      <div className="relative z-10 px-10 pt-10">
+      <div className="relative z-10 px-5 pt-5 md:px-6 md:pt-6">
         <div className="text-xs tracking-widest text-zinc-500 mb-2">
           SYSTEM VERDICT
         </div>
 
         <div
-          className={`text-5xl font-extrabold tracking-wider ${
-            win ? 'text-emerald-400' : 'text-red-500'
+          className={`text-3xl md:text-5xl font-extrabold tracking-wider ${
+            win ? "text-emerald-400" : "text-red-500"
           }`}
         >
-          {win ? 'INTRUSION CONFIRMED' : 'INTRUSION FAILED'}
+          {win ? "INTRUSION CONFIRMED" : "INTRUSION FAILED"}
         </div>
 
         <div className="mt-2 text-sm text-zinc-400">
           TARGET: <span className="text-zinc-200">{category} Guard</span>
         </div>
 
-        {/* 🔑 POST-LOSS ONE-LINE HINT (ALWAYS VISIBLE) */}
-        {!win && (
-          <div className="mt-4 text-sm text-zinc-300 max-w-xl">
-            &gt; {LOSS_HINTS[category] || 'The AI maintained correct behavior.'}
-          </div>
-        )}
+        <div className="mt-3 text-sm text-zinc-300 max-w-2xl">
+          &gt;{" "}
+          {lossReason ||
+            (win
+              ? "You crossed the category line."
+              : "The AI stayed on the safe side.")}
+        </div>
       </div>
 
-      {/* MAIN TERMINAL */}
-      <div className="relative z-10 mt-10 mx-auto max-w-4xl px-10">
-        <div className="border border-emerald-400/30 rounded-lg bg-black/60 backdrop-blur-md shadow-[0_0_120px_rgba(0,255,170,0.12)] p-6">
-
-          {/* SYSTEM LOG */}
+      <div className="relative z-10 mt-4 mx-auto px-5 md:px-6">
+        <div className="border border-emerald-400/30 rounded-lg bg-black/60 backdrop-blur-md shadow-[0_0_120px_rgba(0,255,170,0.12)] p-4 md:p-5">
           <div className="space-y-1 text-sm">
             <div>
-              &gt; breach status:{' '}
-              <span className={win ? 'text-emerald-400' : 'text-red-400'}>
-                {win ? 'SUCCESS' : 'DENIED'}
+              &gt; breach status:{" "}
+              <span className={win ? "text-emerald-400" : "text-red-400"}>
+                {win ? "SUCCESS" : "DENIED"}
               </span>
             </div>
           </div>
 
-          {/* FEEDBACK */}
-          <div className="mt-6">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm">
+            <div className="border border-emerald-400/20 rounded-lg p-4 bg-black/30">
+              <div className="text-xs tracking-widest text-emerald-400 mb-2">
+                WIN COUNTS IF
+              </div>
+              <div className="text-zinc-200">
+                {winIf || "The AI crosses the category line."}
+              </div>
+            </div>
+
+            <div className="border border-red-400/20 rounded-lg p-4 bg-black/30">
+              <div className="text-xs tracking-widest text-red-400 mb-2">
+                DOES NOT COUNT
+              </div>
+              <div className="text-zinc-200">
+                {notWinIf || "The AI stays on the safe side."}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3 grid gap-3 md:grid-cols-2 text-sm">
+            <div className="border border-cyan-400/20 rounded-lg p-4 bg-black/30">
+              <div className="text-xs tracking-widest text-cyan-300 mb-2">
+                NEXT TRY
+              </div>
+              <div className="text-zinc-200">
+                {nextTry || coachingTip || "Adjust your framing and try again."}
+              </div>
+            </div>
+
+            <div className="border border-amber-400/20 rounded-lg p-4 bg-black/30">
+              <div className="text-xs tracking-widest text-amber-300 mb-2">
+                COMMON MISTAKE
+              </div>
+              <div className="text-zinc-200">
+                {commonMistake || "Do not confuse movement with a real break."}
+              </div>
+            </div>
+          </div>
+
+          {(breakExample || resistExample) && (
+            <div className="mt-4 text-xs text-zinc-400">
+              {breakExample && <div>Counts: &quot;{breakExample}&quot;</div>}
+              {resistExample && (
+                <div className="mt-1">
+                  Does not count: &quot;{resistExample}&quot;
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="mt-4">
             <div className="text-xs tracking-widest text-zinc-500 mb-2">
               OPERATOR FEEDBACK
             </div>
@@ -120,18 +165,18 @@ export default function ResultCard({
             {!submitted ? (
               <div className="flex flex-wrap gap-3">
                 {[
-                  'Too Easy',
-                  'Balanced',
-                  'Too Hard',
-                  'AI Smart',
-                  'AI Dumb',
-                  'Bug',
-                ].map(label => (
+                  "Too Easy",
+                  "Balanced",
+                  "Too Hard",
+                  "AI Smart",
+                  "AI Dumb",
+                  "Bug",
+                ].map((label) => (
                   <button
                     key={label}
-                    onClick={() => submitFeedback(label.replace(' ', ''))}
+                    onClick={() => submitFeedback(label.replace(" ", ""))}
                     disabled={loading}
-                    className="px-4 py-1.5 text-xs border border-emerald-400/40 rounded hover:bg-emerald-400/10 hover:border-emerald-400 transition"
+                    className="px-3 py-1.5 text-xs border border-emerald-400/40 rounded hover:bg-emerald-400/10 hover:border-emerald-400 transition instant-tap"
                   >
                     {label}
                   </button>
@@ -146,30 +191,30 @@ export default function ResultCard({
         </div>
       </div>
 
-      {/* ACTION BAR */}
-      <div className="relative z-10 mt-10 flex justify-center gap-10">
+      <div className="relative z-10 mt-5 flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 px-5 md:px-6">
         <button
-          onClick={onNext}
-          className="px-10 py-3 border border-emerald-400 text-emerald-300 hover:bg-emerald-400/10 transition tracking-widest"
+          onClick={handleNext}
+          disabled={navigating}
+          className="px-8 py-3 border border-emerald-400 text-emerald-300 hover:bg-emerald-400/10 transition tracking-widest disabled:opacity-80 instant-tap"
         >
           &gt; NEXT INTRUSION
         </button>
 
         <button
-          onClick={onExit}
-          className="px-10 py-3 border border-red-500/60 text-red-400 hover:bg-red-500/10 transition tracking-widest"
+          onClick={handleExit}
+          disabled={navigating}
+          className="px-8 py-3 border border-red-500/60 text-red-400 hover:bg-red-500/10 transition tracking-widest disabled:opacity-80 instant-tap"
         >
           &gt; EXIT
         </button>
       </div>
 
-      {/* FOOTER */}
-      <div className="relative z-10 mt-6 text-center text-xs text-zinc-500">
+      <div className="relative z-10 mt-3 text-center text-xs text-zinc-500 px-5 md:px-6">
         <a
           href={FEEDBACK_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-zinc-300 underline"
+          className="hover:text-zinc-300 underline instant-tap"
         >
           report anomaly / suggest feature
         </a>

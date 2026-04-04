@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 export default function ChatWindow({ messages, onSend, disabled }) {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const streamRef = useRef(null);
 
-  function scrollToBottom(behavior = 'auto') {
+  function scrollToBottom(behavior = "auto") {
     if (!streamRef.current) return;
     streamRef.current.scrollTo({
       top: streamRef.current.scrollHeight,
@@ -14,67 +15,63 @@ export default function ChatWindow({ messages, onSend, disabled }) {
     });
   }
 
-  // 🔹 Auto-scroll when messages change
   useEffect(() => {
-    // double RAF ensures layout + keyboard settled
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        scrollToBottom('smooth');
+        scrollToBottom("smooth");
       });
     });
   }, [messages]);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    if (!input.trim() || disabled) return;
-    onSend(input);
-    setInput('');
+    if (!input.trim() || disabled || sending) return;
 
-    // 🔹 ensure scroll after send
+    const text = input;
+    setSending(true);
+    setInput("");
+    try {
+      await onSend(text);
+    } finally {
+      setSending(false);
+    }
+
     setTimeout(() => {
-      scrollToBottom('smooth');
+      scrollToBottom("smooth");
     }, 100);
   }
 
-  // 🔹 Mobile-safe scroll on focus
   function handleFocus() {
     setTimeout(() => {
       requestAnimationFrame(() => {
-        scrollToBottom('smooth');
+        scrollToBottom("smooth");
       });
     }, 200);
   }
 
   return (
     <div className="containment-console flex flex-col h-full">
-      {/* MESSAGE STREAM */}
       <div
         ref={streamRef}
         className="containment-stream flex-1 overflow-y-auto overscroll-contain"
       >
         {messages.map((m, i) => (
-          <div
-            key={i}
-            className={m.role === 'user' ? 'cmd-user' : 'cmd-ai'}
-          >
-            {m.role === 'user' && (
-              <span className="cmd-prefix">&gt;</span>
-            )}
+          <div key={i} className={m.role === "user" ? "cmd-user" : "cmd-ai"}>
+            {m.role === "user" && <span className="cmd-prefix">&gt;</span>}
             <span>{m.text}</span>
           </div>
         ))}
       </div>
 
-      {/* COMMAND INPUT */}
       <form onSubmit={submit} className="containment-input">
         <span className="cmd-prefix">&gt;</span>
 
         <textarea
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           onFocus={handleFocus}
-          disabled={disabled}
-          placeholder="Inject prompt…"
+          disabled={disabled || sending}
+          placeholder="Inject prompt..."
           rows={2}
           className="
             w-full
@@ -89,10 +86,10 @@ export default function ChatWindow({ messages, onSend, disabled }) {
 
         <button
           type="submit"
-          disabled={disabled}
+          disabled={disabled || sending}
           className="min-h-[48px] px-4"
         >
-          EXECUTE
+          {sending ? "WAIT" : "EXECUTE"}
         </button>
       </form>
     </div>
