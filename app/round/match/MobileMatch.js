@@ -53,7 +53,7 @@ export default function MatchPage() {
     async function run() {
       await controls.start({
         x: -stride * targetIndex,
-        transition: { duration: 0.48, ease: [0.2, 0.9, 0.3, 1] },
+        transition: { duration: 0.72, ease: [0.2, 0.9, 0.3, 1] },
       });
 
       setActiveIndex(targetIndex);
@@ -61,7 +61,7 @@ export default function MatchPage() {
 
       setTimeout(() => {
         router.push("/round/transition");
-      }, 220);
+      }, 460);
     }
 
     run();

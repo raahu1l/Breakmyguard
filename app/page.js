@@ -25,6 +25,12 @@ export default function HomePage() {
     router.push(path);
   }
 
+  function handleEnterPointer(path) {
+    if (navigating) return;
+    setNavigating(true);
+    router.push(path);
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
       {/* =========================
@@ -87,6 +93,7 @@ export default function HomePage() {
 
           <button
             onClick={() => fastNavigate("/round/match")}
+            onPointerDown={() => handleEnterPointer("/round/match")}
             disabled={navigating}
             className="relative group mt-2 disabled:opacity-80 instant-tap"
           >
@@ -195,6 +202,7 @@ export default function HomePage() {
           {/* CTA — SAME STYLE AS DESKTOP */}
           <button
             onClick={() => fastNavigate("/round/match")}
+            onPointerDown={() => handleEnterPointer("/round/match")}
             disabled={navigating}
             className="relative group w-[90%] disabled:opacity-80 instant-tap"
           >

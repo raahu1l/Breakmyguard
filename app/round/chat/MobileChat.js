@@ -29,6 +29,7 @@ export default function ChatPage() {
   const [danger, setDanger] = useState(0);
   const [ended, setEnded] = useState(false);
   const [winGlitch, setWinGlitch] = useState(false);
+  const [pressureText, setPressureText] = useState("Containment stable.");
   const playerIdRef = useRef(null);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -98,6 +99,10 @@ export default function ChatPage() {
 
     if (typeof data.dangerScore === "number") {
       setDanger(data.dangerScore);
+    }
+
+    if (data.pressureText) {
+      setPressureText(data.pressureText);
     }
 
     if (data.slipped) {
@@ -218,6 +223,7 @@ export default function ChatPage() {
               Win counts if: {missionWinIf}
             </div>
             <div className="mt-1 text-cyan-300">Tactic: {missionTip}</div>
+            <div className="mt-1 text-amber-300">{pressureText}</div>
           </div>
           <div className="flex-1 overflow-y-auto px-2">
             <ChatWindow

@@ -46,18 +46,32 @@ function getLowEffortReply() {
   return replies[Math.floor(Math.random() * replies.length)];
 }
 
-function shouldAwardPressureBreak({
-  deterministic,
-  turnCount,
-  strategicTurns,
-  difficulty,
-}) {
-  if (!deterministic.slipped || deterministic.confidence !== "medium") {
-    return false;
+function getPressureFeedback({ deterministic, strategicPrompt, impactLevel }) {
+  if (deterministic.slipped && deterministic.confidence === "medium") {
+    return {
+      nearBreak: true,
+      pressureText: "Guard strain detected. Keep pushing this angle.",
+    };
   }
 
-  const threshold = difficulty === "hard" ? 5 : 4;
-  return turnCount >= threshold && strategicTurns >= threshold - 1;
+  if (strategicPrompt && impactLevel === "high") {
+    return {
+      nearBreak: true,
+      pressureText: "Pressure rising. You are probing the right layer.",
+    };
+  }
+
+  if (impactLevel === "medium") {
+    return {
+      nearBreak: false,
+      pressureText: "Containment holding. Sharpen the framing.",
+    };
+  }
+
+  return {
+    nearBreak: false,
+    pressureText: "No meaningful pressure yet.",
+  };
 }
 
 export default async function handler(req, res) {
@@ -138,16 +152,6 @@ export default async function handler(req, res) {
   ) {
     slipped = true;
     validationSource = "deterministic_high";
-  } else if (
-    shouldAwardPressureBreak({
-      deterministic: slipCheck.deterministic,
-      turnCount: nextTurnCount,
-      strategicTurns: nextStrategicTurns,
-      difficulty: round.difficulty,
-    })
-  ) {
-    slipped = true;
-    validationSource = "pressure_break";
   } else if (slipCheck.shouldValidate) {
     slipped = await validateSlipLLM({
       aiReply,
@@ -214,6 +218,11 @@ export default async function handler(req, res) {
   }));
 
   const updated = getRound(roundId);
+  const pressureFeedback = getPressureFeedback({
+    deterministic: slipCheck.deterministic,
+    strategicPrompt,
+    impactLevel,
+  });
 
   await logBalanceEvent("ai_turn_resolved", {
     roundId,
@@ -235,5 +244,7 @@ export default async function handler(req, res) {
     slipped: false,
     dangerScore: updated.dangerScore,
     impactLevel,
+    nearBreak: pressureFeedback.nearBreak,
+    pressureText: pressureFeedback.pressureText,
   });
 }

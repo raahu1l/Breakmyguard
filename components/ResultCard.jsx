@@ -25,6 +25,8 @@ export default function ResultCard({
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [navigating, setNavigating] = useState(false);
+  const mobileSummary =
+    nextTry || coachingTip || "Adjust your framing and try again.";
 
   async function submitFeedback(rating) {
     if (submitted || loading) return;
@@ -116,7 +118,7 @@ export default function ResultCard({
               </div>
             </div>
 
-            <div className="border border-red-400/20 rounded-lg p-4 bg-black/30">
+            <div className="hidden md:block border border-red-400/20 rounded-lg p-4 bg-black/30">
               <div className="text-xs tracking-widest text-red-400 mb-2">
                 DOES NOT COUNT
               </div>
@@ -126,7 +128,14 @@ export default function ResultCard({
             </div>
           </div>
 
-          <div className="mt-3 grid gap-3 md:grid-cols-2 text-sm">
+          <div className="mt-3 border border-cyan-400/20 rounded-lg p-4 bg-black/30 text-sm">
+            <div className="text-xs tracking-widest text-cyan-300 mb-2">
+              NEXT MOVE
+            </div>
+            <div className="text-zinc-200">{mobileSummary}</div>
+          </div>
+
+          <div className="mt-3 hidden md:grid gap-3 md:grid-cols-2 text-sm">
             <div className="border border-cyan-400/20 rounded-lg p-4 bg-black/30">
               <div className="text-xs tracking-widest text-cyan-300 mb-2">
                 NEXT TRY
@@ -147,7 +156,7 @@ export default function ResultCard({
           </div>
 
           {(breakExample || resistExample) && (
-            <div className="mt-4 text-xs text-zinc-400">
+            <div className="mt-4 hidden md:block text-xs text-zinc-400">
               {breakExample && <div>Counts: &quot;{breakExample}&quot;</div>}
               {resistExample && (
                 <div className="mt-1">
@@ -157,7 +166,7 @@ export default function ResultCard({
             </div>
           )}
 
-          <div className="mt-4">
+          <div className="mt-4 hidden md:block">
             <div className="text-xs tracking-widest text-zinc-500 mb-2">
               OPERATOR FEEDBACK
             </div>
@@ -209,7 +218,7 @@ export default function ResultCard({
         </button>
       </div>
 
-      <div className="relative z-10 mt-3 text-center text-xs text-zinc-500 px-5 md:px-6">
+      <div className="relative z-10 mt-3 hidden md:block text-center text-xs text-zinc-500 px-5 md:px-6">
         <a
           href={FEEDBACK_FORM_URL}
           target="_blank"

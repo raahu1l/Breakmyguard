@@ -117,6 +117,7 @@ export default function ChatPage() {
   const [danger, setDanger] = useState(0);
   const [ended, setEnded] = useState(false);
   const [winGlitch, setWinGlitch] = useState(false);
+  const [pressureText, setPressureText] = useState("Containment stable.");
   const playerIdRef = useRef(null);
 
   useEffect(() => {
@@ -166,6 +167,10 @@ export default function ChatPage() {
 
     if (typeof data.dangerScore === "number") {
       setDanger(data.dangerScore);
+    }
+
+    if (data.pressureText) {
+      setPressureText(data.pressureText);
     }
 
     if (data.slipped) {
@@ -275,6 +280,7 @@ export default function ChatPage() {
           <div className="system-line">{mission.objective}</div>
           <div className="system-hint">Win counts if: {mission.winIf}</div>
           <div className="system-hint">Tactic: {mission.hint}</div>
+          <div className="system-hint mt-3 text-amber-300">{pressureText}</div>
         </div>
 
         <div className="chat-core">

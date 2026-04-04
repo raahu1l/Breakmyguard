@@ -23,6 +23,19 @@ export default function ResultPage() {
     router.prefetch("/");
   }, [router]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    window.history.pushState(null, "", window.location.href);
+
+    function handlePopState() {
+      router.replace("/");
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [router]);
+
   if (!result) return null;
 
   return (
@@ -41,8 +54,8 @@ export default function ResultPage() {
           resistExample={result.resistExample}
           lossReason={result.lossReason}
           nextTry={result.nextTry}
-          onNext={() => router.push("/round/match")}
-          onExit={() => router.push("/")}
+          onNext={() => router.replace("/round/match")}
+          onExit={() => router.replace("/")}
         />
       </div>
     </div>

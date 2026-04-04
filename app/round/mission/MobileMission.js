@@ -112,7 +112,7 @@ export default function MissionPage() {
   }
 
   return (
-    <div className="min-h-[100svh] bg-mission text-white flex items-start justify-center overflow-y-auto px-4 pt-6 pb-5">
+    <div className="min-h-[100svh] bg-mission text-white flex items-center justify-center overflow-y-auto px-4 py-6">
       <div className="w-full max-w-xl">
         <MissionCard
           category={mission.category}

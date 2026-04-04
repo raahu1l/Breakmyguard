@@ -66,22 +66,22 @@ export default function MatchPage() {
       await Promise.all([
         controls.start({
           x: -CARD_STRIDE * (targetIndex - 2),
-          transition: { duration: 0.3, ease: "linear" },
+          transition: { duration: 0.38, ease: "linear" },
         }),
         bgControls.start({
           "--bg-speed": 35,
-          transition: { duration: 0.3, ease: "easeIn" },
+          transition: { duration: 0.38, ease: "easeIn" },
         }),
       ]);
 
       await Promise.all([
         controls.start({
           x: -CARD_STRIDE * targetIndex,
-          transition: { duration: 0.42, ease: [0.2, 0.9, 0.3, 1] },
+          transition: { duration: 0.58, ease: [0.2, 0.9, 0.3, 1] },
         }),
         bgControls.start({
           "--bg-speed": 60,
-          transition: { duration: 0.42, ease: "easeOut" },
+          transition: { duration: 0.58, ease: "easeOut" },
         }),
       ]);
 
@@ -101,12 +101,12 @@ export default function MatchPage() {
 
       shellControls.start({
         x: [0, -3, 3, -2, 2, 0],
-        transition: { duration: 0.24 },
+        transition: { duration: 0.3 },
       });
 
       setTimeout(() => {
         router.push("/round/transition");
-      }, 220);
+      }, 420);
     }
 
     runSelection();
