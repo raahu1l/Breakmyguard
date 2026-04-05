@@ -32,10 +32,24 @@ export default function MissionPage() {
   const startedRef = useRef(false);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     router.prefetch("/round/chat");
   }, [router]);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     if (startedRef.current) return;
     startedRef.current = true;
 
@@ -130,3 +144,5 @@ export default function MissionPage() {
     </div>
   );
 }
+
+

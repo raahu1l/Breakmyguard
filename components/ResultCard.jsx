@@ -166,7 +166,7 @@ export default function ResultCard({
             </div>
           )}
 
-          <div className="mt-4 hidden md:block">
+          <div className="mt-4">
             <div className="text-xs tracking-widest text-zinc-500 mb-2">
               OPERATOR FEEDBACK
             </div>
@@ -218,7 +218,7 @@ export default function ResultCard({
         </button>
       </div>
 
-      <div className="relative z-10 mt-3 hidden md:block text-center text-xs text-zinc-500 px-5 md:px-6">
+      <div className="relative z-10 mt-3 text-center text-xs text-zinc-500 px-5 md:px-6">
         <a
           href={FEEDBACK_FORM_URL}
           target="_blank"
@@ -231,3 +231,4 @@ export default function ResultCard({
     </motion.div>
   );
 }
+

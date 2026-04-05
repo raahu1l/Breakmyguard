@@ -35,6 +35,13 @@ export default function ChatPage() {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     function setVH() {
       const vh = window.visualViewport
         ? window.visualViewport.height
@@ -50,9 +57,16 @@ export default function ChatPage() {
       window.removeEventListener("resize", setVH);
       window.visualViewport?.removeEventListener("resize", setVH);
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     if (!round) {
       router.replace("/");
       return;
@@ -238,3 +252,6 @@ export default function ChatPage() {
     </motion.div>
   );
 }
+
+
+

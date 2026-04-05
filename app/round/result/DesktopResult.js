@@ -23,12 +23,27 @@ export default function ResultPage() {
     router.prefetch("/");
   }, [router]);
 
+  function closeFinishedRound() {
+    if (typeof window === "undefined") return;
+    sessionStorage.setItem("roundClosed", "1");
+    sessionStorage.removeItem("activeRound");
+    sessionStorage.removeItem("selectedCategory");
+  }
+
+  function prepareNextRound() {
+    if (typeof window === "undefined") return;
+    sessionStorage.removeItem("roundClosed");
+    sessionStorage.removeItem("activeRound");
+    sessionStorage.removeItem("selectedCategory");
+  }
+
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
     window.history.pushState(null, "", window.location.href);
 
     function handlePopState() {
+      closeFinishedRound();
       router.replace("/");
     }
 
@@ -54,10 +69,18 @@ export default function ResultPage() {
           resistExample={result.resistExample}
           lossReason={result.lossReason}
           nextTry={result.nextTry}
-          onNext={() => router.replace("/round/match")}
-          onExit={() => router.replace("/")}
+          onNext={() => {
+            prepareNextRound();
+            router.replace("/round/match");
+          }}
+          onExit={() => {
+            closeFinishedRound();
+            router.replace("/");
+          }}
         />
       </div>
     </div>
   );
 }
+
+

@@ -121,6 +121,13 @@ export default function ChatPage() {
   const playerIdRef = useRef(null);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     if (!round) {
       router.replace("/");
       return;
@@ -294,3 +301,5 @@ export default function ChatPage() {
     </motion.div>
   );
 }
+
+

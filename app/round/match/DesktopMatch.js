@@ -57,6 +57,13 @@ export default function MatchPage() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      sessionStorage.getItem("roundClosed") === "1"
+    ) {
+      router.replace("/");
+      return;
+    }
     sessionStorage.setItem("selectedCategory", JSON.stringify(chosen));
     router.prefetch("/round/transition");
 
@@ -221,3 +228,5 @@ function HudPanel({ text, pos }) {
     </div>
   );
 }
+
+
