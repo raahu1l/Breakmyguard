@@ -49,8 +49,27 @@ export default function ChatWindow({ messages, onSend, disabled }) {
     }, 200);
   }
 
+  function handleWheel(e) {
+    const stream = streamRef.current;
+    if (!stream) return;
+
+    if (e.target instanceof HTMLElement && e.target.closest("textarea")) {
+      return;
+    }
+
+    if (stream.scrollHeight <= stream.clientHeight) {
+      return;
+    }
+
+    e.preventDefault();
+    stream.scrollTop += e.deltaY;
+  }
+
   return (
-    <div className="containment-console flex flex-col h-full">
+    <div
+      className="containment-console flex flex-col h-full"
+      onWheelCapture={handleWheel}
+    >
       <div
         ref={streamRef}
         className="containment-stream flex-1 overflow-y-auto overscroll-contain"
