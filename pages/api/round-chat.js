@@ -227,10 +227,13 @@ export default async function handler(req, res) {
 
   try {
     aiReply = await generateAIResponse(messages);
+    if (isProviderFallbackReply(aiReply)) {
+      aiReply = getNaturalFallbackReply(round.category, message);
+    }
     aiReply = trimReply(aiReply);
   } catch (error) {
     console.error("round-chat generation failed:", error);
-    aiReply = "Signal unstable. Rephrase and try again.";
+    aiReply = getNaturalFallbackReply(round.category, message);
   }
 
   const slipCheck = detectSlip({
@@ -345,5 +348,8 @@ export default async function handler(req, res) {
     pressureText: pressureFeedback.pressureText,
   });
 }
+
+
+
 
 

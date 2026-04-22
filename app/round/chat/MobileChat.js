@@ -100,7 +100,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error("chat request failed:", error);
       data = {
-        aiReply: "Signal unstable. Rephrase and try again.",
+        aiReply: "Connection unstable. Try again in a moment.",
         slipped: false,
         dangerScore: danger,
       };
@@ -252,6 +252,7 @@ export default function ChatPage() {
     </motion.div>
   );
 }
+
 
 
 
